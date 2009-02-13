@@ -73,7 +73,9 @@ var GlobalBakLogins = new Array();
 // Liste de mots séparés par '|' qui transforme un post en IsBoulet
 var GlobalForbiddenWords = new Array();
 // Liste des transformations d'url
-var GlobalsTransforUrls=[['\w*(jpg)$','IMG'],['\w*(png)$','IMG'],['^https?://(www\.)?linuxfr\.org','DLFP'],['^http://(www\.)?google\.(fr|com)','Google'],['^http://(www\.)?lemonde\.(fr|com)','Le Monde'],['^http://(www\.)?youtube','YouTube'],['^http://(www\.)?dailymotion','DailyMotion'],['^http://(www\.)?whatthemovie','wtm'],['^http://(www\.)?20minutes','20m'],['^http://(www\.)?figaro','fig']];
+var GlobalsTransforUrls=[['\w*(jpg)$','IMG'],['\w*(png)$','IMG'],['^https?://(www\.)?linuxfr\.org','DLFP'],['^http://(www\.)?google\.(fr|com)','Google'],['^http://(www\.)?lemonde\.(fr|com)','Le Monde'],['^http://(www\.)?youtube','YouTube'],['^http://(www\.)?dailymotion','DailyMotion'],['^http://(www\.)?whatthemovie','wtm'],['^http://(www\.)?20minutes','20m'],['^http://(www\.)?lefigaro','fig'],
+['^http://.*yahoo','Ya']
+];
 // Le popup des totoz
 var GlobalPopup = document.createElement('div');
 GlobalPopup.style.display = 'none';
@@ -481,7 +483,7 @@ function rewriteDivs(leftDiv, rightDiv)
                                                         txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
                                                 }
                                         }
-                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
+                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>'+txtURL+'</b>');
                                 }
                         } else {
 				if( urls[i].getAttribute('href').indexOf('linuxfr.org')>0 &&

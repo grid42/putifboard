@@ -481,8 +481,8 @@ function rewriteDivs(leftDiv, rightDiv)
                                                 regURL = new RegExp(GlobalsTransforUrls[j][0]);
                                                 if(regURL.test(urls[i].getAttribute('href'))) {
                                                         txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
-							j=1000000000;
                                         		urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>'+txtURL+'</b>');
+							break;
                                                 }
                                         }
                                 }

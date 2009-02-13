@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.13
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.14
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -20,7 +20,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.02.13';
+const VERSION = '2009.02.14';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const BAS_EN_HAUT = 1;
 const HAUT_EN_BAS = 2;
@@ -73,7 +73,7 @@ var GlobalBakLogins = new Array();
 // Liste de mots séparés par '|' qui transforme un post en IsBoulet
 var GlobalForbiddenWords = new Array();
 // Liste des transformations d'url
-var GlobalsTransforUrls=[['jpg','IMG'],['png','IMG'],['google','GOG'],['apple','apple'],['yahoo','Ya'],['lemonde','Le Monde'],['youtube','YouTube'],['linuxfr.org','DLFP'],['whatthemovie','wtm'],['20minutes','20m'],['figaro','fig']];
+var GlobalsTransforUrls=[['\w*(jpg)$','IMG'],['\w*(png)$','IMG'],['^https?://(www\.)?linuxfr\.org','DLFP'],['^http://(www\.)?google\.(fr|com)','Google'],['^http://(www\.)?lemonde\.(fr|com)','Le Monde'],['^http://(www\.)?youtube','YouTube'],['^http://(www\.)?dailymotion','DailyMotion'],['^http://(www\.)?whatthemovie','wtm'],['^http://(www\.)?20minutes','20m'],['^http://(www\.)?figaro','fig']];
 // Le popup des totoz
 var GlobalPopup = document.createElement('div');
 GlobalPopup.style.display = 'none';
@@ -463,23 +463,25 @@ function rewriteDivs(leftDiv, rightDiv)
                 }
         } else {
                 urls = rightDiv.getElementsByTagName('a');
+                var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
                 for (i=0; i<urls.length;i++) {
+                        if(regURL.test(urls[i].getAttribute('href'))) {
+                                if (readCookie('https')=='1') {
+                                        urls[i].protocol="https:";
+                                } else {
+                                        urls[i].protocol="http:";
+                                }
+                        }
                         if(urls[i].innerHTML.indexOf('[url]')>0) {
-                                for(j=0; j<GlobalsTransforUrls.length;j++) {
-                                        if(urls[i].getAttribute('href')) {
-                                                if(urls[i].getAttribute('href').indexOf(GlobalsTransforUrls[j][0])!=-1) {
-                                                        if(GlobalsTransforUrls[j][1] == 'DLFP') {
-                                                		if(urls[i].getAttribute('href').indexOf(GlobalsTransforUrls[j][0])<13) {
-                	                                         	if (readCookie('https')=='1') {
-	          	                                                	urls[i].protocol="https:";
-		                                                        } else {
-										urls[i].protocol="http:";
-	                                                        	}
-								}
-							}
-                                                        urls[i].innerHTML='<b>['+GlobalsTransforUrls[j][1]+']</b>';
+                                var txtURL = "";
+                                if(urls[i].getAttribute('href')) {
+                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
+                                                regURL = new RegExp(GlobalsTransforUrls[j][0]);
+                                                if(regURL.test(urls[i].getAttribute('href'))) {
+                                                        txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
                                                 }
                                         }
+                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
                                 }
                         } else {
 				if( urls[i].getAttribute('href').indexOf('linuxfr.org')>0 &&

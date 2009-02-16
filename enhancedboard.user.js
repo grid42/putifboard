@@ -486,19 +486,7 @@ function rewriteDivs(leftDiv, rightDiv)
                                                 }
                                         }
                                 }
-                        } else {
-				if( urls[i].getAttribute('href').indexOf('linuxfr.org')>0 &&
-			 		urls[i].getAttribute('href').indexOf('linuxfr.org')<13) {
-					if (readCookie('https')=='1') {
-        		                	urls[i].protocol="https:";
-	        	                } else {
-                        	        	urls[i].protocol="http:";
-                                	}
-				} else {
-					_log(urls[i].getAttribute('href'));
-					_log(urls[i].getAttribute('href').indexOf('linuxfr.org'));
-				}
-			}
+                        } 
                 }
                 var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
                 var exp_moules = new RegExp('(moules&lt;)', 'g');

@@ -1036,7 +1036,9 @@ function addGlobalStyle(css)
         style.type = 'text/css';
         style.innerHTML = css;
         head.appendChild(style);
-
+}
+function addGlobalScript()
+{
         //scp = document.createElement('script');
         //scp.setAttribute('language','javascript');
         //scp.setAttribute('src','http://scripts.url2thumb.com/thumbnails/thumbs.js?border=004891');
@@ -1070,6 +1072,7 @@ function onLoad()
         }
         cleanPage();
         addCSS();
+        addGlobalScript();
         createCustomElements();
         displayPanel();
         onLoadGetMessages();

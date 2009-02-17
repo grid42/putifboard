@@ -99,6 +99,8 @@ GlobalTimer.setAttribute('class','timer');
 GlobalTimer.setAttribute('id','timer');
 GlobalTimer.style.display='none';
 
+var GlobalConfigTabId = 0;
+
 // Lapin compris
 var previousHorloge = '';
 var currentHorlogeNumber = 1;
@@ -638,6 +640,31 @@ function reverseTribune()
         rewriteInput();
 }
 
+function addTransforUrl()
+{
+  if (document.getElementById('newRegexURL').value=="" || document.getElementById('newURL').value=="") {
+    _log("addTransforUrl Boulet !!!");
+  } else {
+    var a = [[document.getElementById('newRegexURL').value,document.getElementById('newURL').value]];
+    GlobalsTransforUrls=GlobalsTransforUrls.concat(a);
+    GM_setValue('dlfp.GlobalsTransforUrls',serialize(GlobalsTransforUrls));
+    window.location.reload();
+  }
+}
+
+function removeTransforUrl()
+{
+  var result = new Array();
+  for (elemId in GlobalsTransforUrls) {
+    if (document.getElementById('uTransforUrls').value != GlobalsTransforUrls[elemId] && elemId != 'contains' ) {
+      result=result.concat([GlobalsTransforUrls[elemId]]);
+    }
+  }
+  GlobalsTransforUrls=result;  
+  GM_setValue('dlfp.GlobalsTransforUrls',serialize(GlobalsTransforUrls));
+  window.location.reload();
+}
+
 function manageEvent(event)
 {
         eventType = event.type;
@@ -798,7 +825,19 @@ function cleanPage()
         elements = evalexp("//div[@class='boardindex']/p[position()<2]");
         elements.snapshotItem(0).innerHTML='';
 }
-
+function addOnglet(label) {
+        GlobalConfigTabId +=1;
+        element = document.createElement('li');
+        element.id="o_" + GlobalConfigTabId;
+        if (GlobalConfigTabId == 1) {
+          element.setAttribute('class','myConfigTabs_selected');
+        } else {
+          element.setAttribute('class','myConfigTabs');
+        }
+        element.setAttribute('onclick','changeOnglet(this);');
+        element.innerHTML=label;
+        return element;
+}
 function addToolbarIcon(tool_id, img_src, img_title) {
         element = document.createElement('img');
         element.setAttribute('id',tool_id);
@@ -821,6 +860,36 @@ function addToolbarButton(but_id, txt) {
         td_el.appendChild(but);
         tr_el.appendChild(td_el);
         return tr_el;
+}
+
+function addToolbarList(c_id, tab){
+        tr_el = document.createElement('tr');
+        tr_el.setAttribute('class','subpanel');
+        
+        td_el = document.createElement('td');
+        td_el.setAttribute('class','subpanel');
+        td_el.setAttribute('colspan','2');
+
+        but = document.createElement('select');
+        but.setAttribute('id',c_id);
+        but.setAttribute('size',20);
+
+        for(i=0; i< tab.length; i++) {
+                opt = document.createElement('option');
+                opt.innerHTML=tab[i];
+                but.appendChild(opt);
+        }
+
+        td_el.appendChild(but);
+        
+        but = document.createElement('button');
+        but.setAttribute('id','uSupTransforUrl');
+        but.setAttribute('name','uSupTransforUrl');
+        but.setAttribute('value','Supprimer');
+        but.innerHTML='Supprimer';
+        td_el.appendChild(but);
+        tr_el.appendChild(td_el);
+        return tr_el
 }
 
 function addToolbarCheckBox(c_id, txt, val) {
@@ -918,68 +987,97 @@ function displayPanel()
         expandLink.appendChild(addToolbarIcon('uUpdate',
                                 HOME_URL + '/web_16x16.png',
                                 'A moi les fritures'));
-        
-        hiddenPanel = document.createElement('table');
-        hiddenPanel.setAttribute('class','subpanel');
+        hiddenPanel = document.createElement('div');
         hiddenPanel.setAttribute('id','configZone');
         hiddenPanel.style.display = 'none';
+        ConfigsTabs = document.createElement('div');
+        ConfigsTabs.id="ConfigsTabs";
+        ongletMenu = document.createElement('ul');
+        ongletMenu.appendChild(addOnglet('Configuration'));
+        ongletMenu.appendChild(addOnglet('URL Transform'));
+        ConfigsTabs.appendChild(ongletMenu);
+        hiddenPanel.appendChild(ConfigsTabs);
+        mes_contenus = document.createElement('div');
+        mes_contenus.id="mes_contenus";
+        onglet1 = document.createElement('div');
+        onglet1.id="co_1";
+        onglet1.setAttribute('class','mon_contenu');
+        panelOnglet1 = document.createElement('table');
+        panelOnglet1.setAttribute('class','subpanel');
+        panelOnglet1.setAttribute('id','configPanel');
         
-        hiddenPanel.appendChild(addToolbarButton('sens','Retourner la tribune'));
+        panelOnglet1.appendChild(addToolbarButton('sens','Retourner la tribune'));
         
-        hiddenPanel.appendChild(addToolbarCheckBox('uautorefresh',
+        panelOnglet1.appendChild(addToolbarCheckBox('uautorefresh',
                                 'Auto Refresh', 
                                 GM_getValue('dlfp.autorefresh')));
-        hiddenPanel.appendChild(addToolbarTextBox('timeoutinput',
+        panelOnglet1.appendChild(addToolbarTextBox('timeoutinput',
                                 'Déclencheur', 
                                 GM_getValue('dlfp.timeout')/1000,3));
-        hiddenPanel.appendChild(addToolbarTextBox('uainput',
+        panelOnglet1.appendChild(addToolbarTextBox('uainput',
                                 'User-Agent', 
                                 GM_getValue('dlfp.ua'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('uBakinput',
+        panelOnglet1.appendChild(addToolbarTextBox('uBakinput',
                                 'BoitAkon', 
                                 GM_getValue('dlfp.baklogins'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('uforbiddenWord',
+        panelOnglet1.appendChild(addToolbarTextBox('uforbiddenWord',
                                 'Mots censurés', 
                                 GM_getValue('dlfp.forbiddenwords'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('titleinput',
+        panelOnglet1.appendChild(addToolbarTextBox('titleinput',
                                 'Titre', 
                                 document.title,50));
-        hiddenPanel.appendChild(addToolbarTextBox('faviconinput',
+        panelOnglet1.appendChild(addToolbarTextBox('faviconinput',
                                 'Favicon', 
                                 GM_getValue('dlfp.favicon'),50));
-        hiddenPanel.appendChild(addToolbarCheckBox('uchasse',
+        panelOnglet1.appendChild(addToolbarCheckBox('uchasse',
                                 'Chasse ouverte', 
                                 GM_getValue('dlfp.chasse')));
-        hiddenPanel.appendChild(addToolbarSelectBox('ubouletmode',
+        panelOnglet1.appendChild(addToolbarSelectBox('ubouletmode',
                                 'Mode de filtrage', 
                                 ['putifuto','nedflan'], 
                                 GM_getValue('dlfp.antibouletmode'),50));
-        hiddenPanel.appendChild(addToolbarSelectBox('utotozmode',
+        panelOnglet1.appendChild(addToolbarSelectBox('utotozmode',
                                 'Totoz', 
                                 ['popup','inline'], 
                                 GM_getValue('dlfp.totoz'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('utotozsrv',
+        panelOnglet1.appendChild(addToolbarTextBox('utotozsrv',
                                 'Serveur totoz', 
                                 GM_getValue('dlfp.totozsrv'),50));
-        hiddenPanel.appendChild(addToolbarSelectBox('uclignotement',
+        panelOnglet1.appendChild(addToolbarSelectBox('uclignotement',
                                 'Alerte',
                                 ['Inactif','Simple','Clignotement'], 
                                 GM_getValue('dlfp.clignotement')));
-        hiddenPanel.appendChild(addToolbarCheckBox('umyalert',
+        panelOnglet1.appendChild(addToolbarCheckBox('umyalert',
                                 'Alertes égoïstes', 
                                 GM_getValue('dlfp.myalert')));
-        hiddenPanel.appendChild(addToolbarCheckBox('uinputfixed',
+        panelOnglet1.appendChild(addToolbarCheckBox('uinputfixed',
                                 'Formulaire fixe', 
                                 GM_getValue('dlfp.inputfixed')));
-        hiddenPanel.appendChild(addToolbarCheckBox('ump3',
+        panelOnglet1.appendChild(addToolbarCheckBox('ump3',
                                 'Musique', 
                                 GM_getValue('dlfp.mp3')));
 
-        hiddenPanel.innerHTML += '<tr class="subpanel">'+
+        panelOnglet1.innerHTML += '<tr class="subpanel">'+
                 '<td style="text-align:right;color:gray;top:3px;" '+
                 'class="subpanel" colspan="2">'+
                 'Current version : <a href="' + HOME_URL + '">' + VERSION + '</a></td></tr>';
-
+        onglet1.appendChild(panelOnglet1);
+        mes_contenus.appendChild(onglet1);
+        
+        onglet2 = document.createElement('div');
+        onglet2.id="co_2";
+        onglet2.setAttribute('class','mon_contenu');
+        onglet2.setAttribute('style','display: none;');
+        panelOnglet2 = document.createElement('table');
+        panelOnglet2.setAttribute('class','subpanel');
+        panelOnglet2.setAttribute('id','urlTransform');
+        panelOnglet2.appendChild(addToolbarTextBox('newRegexURL','Nouvelle RegEx','',50));
+        panelOnglet2.appendChild(addToolbarTextBox('newURL','Tag','',50));
+        panelOnglet2.appendChild(addToolbarButton('uAddTransforUrl','Ajouter la règle'));
+        panelOnglet2.appendChild(addToolbarList('uTransforUrls',GlobalsTransforUrls));
+        onglet2.appendChild(panelOnglet2);
+        mes_contenus.appendChild(onglet2);
+        hiddenPanel.appendChild(mes_contenus);
         panel.appendChild(expandLink);
         panel.appendChild(hiddenPanel);
 }
@@ -1096,11 +1194,27 @@ function addGlobalStyle(css)
 }
 function addGlobalScript()
 {
-        //scp = document.createElement('script');
-        //scp.setAttribute('language','javascript');
-        //scp.setAttribute('src','http://scripts.url2thumb.com/thumbnails/thumbs.js?border=004891');
-        //scp.setAttribute('type','text/javascript');
-        //document.getElementsByTagName('body')[0].appendChild(scp);
+        var head, style;
+        head = document.getElementsByTagName('head')[0];
+        if (!head) { return; }
+        element = document.createElement('script');
+        element.setAttribute('type','text/javascript');
+        element.innerHTML = 'function changeOnglet(_this){'+
+        'var getOnglets  = document.getElementById("ConfigsTabs").getElementsByTagName("li");'+
+        'for(var i = 0; i < getOnglets.length; i++){'+
+        'if(getOnglets[i].id){'+
+        'if(getOnglets[i].id == _this.id){'+
+        'getOnglets[i].className = "myConfigTabs_selected";'+
+        'document.getElementById("c" + _this.id).style.display    = "block";'+
+        '}'+
+        'else{'+
+        'getOnglets[i].className = "myConfigTabs";'+
+        'document.getElementById("c" + getOnglets[i].id).style.display  = "none";'+
+        '}'+
+        '}'+
+        '}'+
+        '}';
+  head.appendChild(element);
 }
 
 /* events handling functions */
@@ -1500,6 +1614,10 @@ function onChange(event)
                 window.location.reload();
         } else if(event.target.id == 'message') {
                 // non traitée
+        } else if(event.target.id == 'newRegexURL') {
+                // non traitée
+        } else if(event.target.id == 'newURL') {
+        } else if(event.target.id == 'uTransforUrls') {
         } else {
                         alert("ERROR " + event.target.id);
         }
@@ -1518,6 +1636,8 @@ function onFocus(event)
                 case 'titleinput':
                 case 'faviconinput' :
                 case 'utotozsrv':
+                case 'newRegexURL':
+                case 'newURL':
                         GlobalIsTyping = true;
                         break;
                 case 'message':
@@ -1559,6 +1679,12 @@ function onClick(event)
                         if(!GlobalReverseInProgress) {
                                 reverseTribune();
                         }
+                        return true;
+                case 'uAddTransforUrl':
+                        addTransforUrl();
+                        return true;
+                case 'uSupTransforUrl':
+                        removeTransforUrl();
                         return true;
                 default:
         }

@@ -43,6 +43,7 @@ const DEFAULT_CLIGNOTEMENT = 'clignotement';
 const DEFAULT_MYALERT = false;
 const DEFAULT_INPUTFIXED = true;
 const DEFAULT_MP3 = false;
+const HOME_URL = 'http://renardjb.googlepages.com';
 const PANEL_WIDTH = 20;
 //--- End Section  ---
 
@@ -859,13 +860,13 @@ function displayPanel()
         expandLink.setAttribute('id','panelLinks');
 
         expandLink.appendChild(addToolbarIcon('refresh',
-                                'http://renardjb.googlepages.com/refresh_16x16.png',
+                                HOME_URL + '/refresh_16x16.png',
                                 'Allons à la pêche aux trolls'));
         expandLink.appendChild(addToolbarIcon('configZoneLink',
-                                'http://renardjb.googlepages.com/Settings-16x16.png',
+                                HOME_URL + '/Settings-16x16.png',
                                 'Configuration'));
         expandLink.appendChild(addToolbarIcon('uUpdate',
-                                'http://renardjb.googlepages.com/web_16x16.png',
+                                HOME_URL + '/web_16x16.png',
                                 'A moi les fritures'));
         
         hiddenPanel = document.createElement('table');
@@ -927,7 +928,7 @@ function displayPanel()
         hiddenPanel.innerHTML += '<tr class="subpanel">'+
                 '<td style="text-align:right;color:gray;top:3px;" '+
                 'class="subpanel" colspan="2">'+
-                'Current version : <a href="http://renardjb.googlepages.com/">' + VERSION + '</a></td></tr>';
+                'Current version : <a href="' + HOME_URL + '">' + VERSION + '</a></td></tr>';
 
         panel.appendChild(expandLink);
         panel.appendChild(hiddenPanel);
@@ -1487,7 +1488,7 @@ function onClick(event)
                         }
                         return true;
                 case 'uUpdate':
-                        window.location = 'http://renardjb.googlepages.com/enhancedboard.user.js';
+                        window.location = HOME_URL + '/enhancedboard.user.js';
                         event.stopPropagation();
                         return true;
                 case 'configZoneLink':

@@ -144,13 +144,13 @@ for(i in global_variables) {
                 GM_setValue('dlfp.' + global_variables[i], value);
         }
 }
-delete global_variables;
 
 // Petit hack 
 if (GM_getValue('dlfp.clignotement')==true || 
     GM_getValue('dlfp.clignotement')==false) {
         GM_setValue('dlfp.clignotement','Clignotement');
 }
+delete global_variables;
 
 /* ajout des events listeners */
 global_events = ['load','blur','click','submit','mouseover','mouseout',
@@ -184,7 +184,7 @@ if (readCookie('https')=='1') {
 // Section "OnLoadEvent"
 function addCSS()
 {
-        addGlobalStyle(        '.main {' +
+        addGlobalStyle( '.main {' +
                         'background-color:#ededdb!important;' +
                         'margin:0!important;' +
                         'padding:0!important;' +
@@ -343,14 +343,13 @@ function addCSS()
                         '}');
 
                         if (GM_getValue('dlfp.inputfixed')==true) {
-                                addGlobalStyle(        '.menubar {' +
+                                addGlobalStyle('.menubar {' +
                                 'position:fixed;' +
                                 'top:0;' +
                                 'left:0;' +
                                 'width:100%;' +
                                 '}' );
-                                }
-
+                        }
 }
 
 // Call this function once on onLoad Event
@@ -1511,7 +1510,6 @@ function onClick(event)
         }
         switch(nodeName) {
                 case 'span':
-//                        'ENCOURS
                         if(nodeClass.indexOf('horloge',0)!=-1) {
                                 queryLeft = '//div[starts-with(@class,\'boardleftmsg\') and contains(@class,\'highlighted\')]';
                                 var allLeftDiv = evalexp(queryLeft);
@@ -1532,30 +1530,28 @@ function onClick(event)
                                                 GlobalClickTimer = setInterval(highlightedClick,100);
                                         }
                                 }
+                        } else if(nodeClass.indexOf('canard',0)!=-1) {
+                          if (target.parentNode.nodeName.toLowerCase() == 'div' &&
+                              getClass(target.parentNode).match('boardrightmsg')) {
+                                clockId = getId(target.parentNode);
+                                horlogeToInsert = clockId.substring(0,8);
+                                indice = parseInt(clockId.charAt(8));
+                                exposant = '';
+                                if(indice > 1 && indice < 4) {
+                                        exposant = String.fromCharCode(176 + indice); 
+                                } else if(indice > 3) {
+                                        exposant = '^' + indice
+                                } else {
+                                        if(document.getElementById(horlogeToInsert + (indice + 1))) {
+                                                exposant = String.fromCharCode(185);
+                                        }
+                                }
+                                horlogeToInsert = horlogeToInsert + exposant;
+                                appendTextToMessage(horlogeToInsert + ' pan ! pan ! ');
+                          }
                         }
-      else if(nodeClass.indexOf('canard',0)!=-1) {
-        if (target.parentNode.nodeName.toLowerCase() == 'div' && getClass(target.parentNode).match('boardrightmsg')) {
-          clockId = getId(target.parentNode);
-          horlogeToInsert = clockId.substring(0,8);
-          indice = parseInt(clockId.charAt(8));
-          exposant = '';
-          if(indice > 1 && indice < 4) {
-                  exposant = String.fromCharCode(176 + indice); 
-          } else if(indice > 3) {
-                  exposant = '^' + indice
-          } else {
-                  // Existe-t-il un id = 1
-                  if(document.getElementById(horlogeToInsert + (indice + 1))) {
-                          exposant = String.fromCharCode(185);
-                  }
-          }
-          horlogeToInsert = horlogeToInsert + exposant;
-          appendTextToMessage(horlogeToInsert + ' pan ! pan ! ');
-        }
-      }
                         break;
                 case 'div':
-                        
                         break;
                 case 'input':
                         if(GlobalIsFortuning && GlobalIsFortuned) {
@@ -1572,12 +1568,15 @@ function onClick(event)
                 case 'a':
                         break;
                 case 'b':
-                        if( (target.parentNode.nodeName.toLowerCase() == 'div' && getClass(target.parentNode).match('boardleftmsg'))
-                        || (target.parentNode.nodeName.toLowerCase() == 'span' && getClass(target.parentNode) == 'bigorno') ) {
-                                if(target.parentNode.nodeName.toLowerCase() == 'span' && getClass(target.parentNode) == 'bigorno') {
+                        if( (target.parentNode.nodeName.toLowerCase() == 'div' && 
+                             getClass(target.parentNode).match('boardleftmsg'))
+                                || 
+                            (target.parentNode.nodeName.toLowerCase() == 'span' && 
+                             getClass(target.parentNode) == 'bigorno') ) {
+                                if(target.parentNode.nodeName.toLowerCase() == 'span' &&
+                                   getClass(target.parentNode) == 'bigorno') {
                                         clockId = getId(target.parentNode.parentNode);
-                                }
-                                else {
+                                } else {
                                         clockId = getId(target.parentNode);
                                 }
                                 horlogeToInsert = clockId.substring(0,8);
@@ -1741,7 +1740,6 @@ function unhighlightLeftHorloge(id)
 /* slip GET & POST functions */
 function refreshSlip()
 {
-
         if(!GlobalReverseInProgress) {
                 window.clearInterval(GlobalRefreshTimerId);
                 GlobalTimer.style.display='';
@@ -1770,8 +1768,6 @@ function slipProgress(event){};
 function slipError(event){
         GlobalTimer.style.display='none';
         initRefresh();
-//        GlobalRefreshTimerId = window.setInterval(refreshSlip,
-//                                                GM_getValue('dlfp.timeout'));
 };
 function slipLoaded(details)
 {
@@ -1871,8 +1867,6 @@ function slipLoaded(details)
         document.getElementById('refresh').style.color = 'black';
         GlobalTimer.style.display='none';
         initRefresh();
-        //GlobalRefreshTimerId = window.setInterval(refreshSlip,
-        //                                        GM_getValue('dlfp.timeout'));
 }
 
 function postToSlip(inputField)

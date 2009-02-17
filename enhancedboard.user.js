@@ -357,6 +357,40 @@ function addCSS()
                         '}' +
                         '.smallmenubar,.lsfnbanner,.menusearch,.boulet {' +
                         'display:none;' +
+                        '}' +
+                        'ul, li{' +
+                        'list-style: none;' +
+                        '}' +
+                        '.myConfigTabs{' +
+                        'float: left;' +
+                        'padding: 2px 10px;' +
+                        'margin-right: 5px;' +
+                        'color: #333;' +
+                        'background: #C4C4C2;' +
+                        'border: 1px solid #B3B3B1;' +
+                        'cursor: pointer;' +
+                        'margin-bottom: -1px;' +
+                        '} ' +
+                        '.myConfigTabs:hover{' +
+                        'background: #D5D5D3;' +
+                        '} ' +
+                        '.myConfigTabs_selected{' +
+                        'float: left;' +
+                        'padding: 2px 10px;' +
+                        'margin-right: 5px;' +
+                        'color: #333;' +
+                        'background: #D5D5D3;' +
+                        'border-top: 1px solid #B3B3B1;' +
+                        'border-right: 1px solid #B3B3B1;' +
+                        'border-left: 1px solid #B3B3B1; ' +
+                        'cursor: pointer; ' +
+                        'margin-bottom: -1px;' +
+                        '}     ' +
+                        '.clear{' +
+                        'clear: both;' +
+                        '}' +
+                        '.mon_contenu{' +
+                        'padding: 10px;    ' +
                         '}');
 
                         if (GM_getValue('dlfp.inputfixed')==true) {

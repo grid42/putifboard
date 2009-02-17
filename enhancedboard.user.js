@@ -43,8 +43,8 @@ const DEFAULT_CLIGNOTEMENT = 'clignotement';
 const DEFAULT_MYALERT = false;
 const DEFAULT_INPUTFIXED = true;
 const DEFAULT_MP3 = false;
-const PANEL_WIDTH = 20;
 const HOME_URL = 'http://renardjb.googlepages.com';
+const PANEL_WIDTH = 20;
 const DEFAULT_GLOBALSTRANSFORURLS = [
   ['\w*(jpg)$','IMG'],
   ['\w*(png)$','IMG'],
@@ -156,6 +156,7 @@ for(i in global_variables) {
                 GM_setValue('dlfp.' + global_variables[i], value);
         }
 }
+delete global_variables;
 
 /* Define default settings serializer */
 global_variables = ['GlobalsTransforUrls'] ;
@@ -624,7 +625,7 @@ function reverseTribune()
 function addTransforUrl()
 {
   if (document.getElementById('newRegexURL').value=="" || document.getElementById('newURL').value=="") {
-    alert("Boulet !!!");
+    _log("addTransforUrl Boulet !!!");
   } else {
     var a = [[document.getElementById('newRegexURL').value,document.getElementById('newURL').value]];
     GlobalsTransforUrls=GlobalsTransforUrls.concat(a);
@@ -2246,7 +2247,10 @@ function getSelectedText(){
 }
 
 function serialize( mixed_value ) {
-    // http://kevin.vanzonneveld.net
+    // Returns a string representation of variable (which can later be unserialized)  
+    // 
+    // version: 812.3015
+    // discuss at: http://phpjs.org/functions/serialize
     // +   original by: Arpad Ray (mailto:arpad@php.net)
     // +   improved by: Dino
     // +   bugfixed by: Andrej Pavlovic
@@ -2257,7 +2261,6 @@ function serialize( mixed_value ) {
     // *     returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
     // *     example 2: serialize({firstName: 'Kevin', midName: 'van', surName: 'Zonneveld'});
     // *     returns 2: 'a:3:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";s:7:"surName";s:9:"Zonneveld";}'
- 
     var _getType = function( inp ) {
         var type = typeof inp, match;
         var key;
@@ -2325,10 +2328,11 @@ function serialize( mixed_value ) {
     if (type != "object" && type != "array") val += ";";
     return val;
 }
-
-
 function unserialize(data){
-    // http://kevin.vanzonneveld.net
+    // Takes a string representation of variable and recreates it  
+    // 
+    // version: 810.114
+    // discuss at: http://phpjs.org/functions/unserialize
     // +     original by: Arpad Ray (mailto:arpad@php.net)
     // +     improved by: Pedro Tainha (http://www.pedrotainha.com)
     // +     bugfixed by: dptr1988
@@ -2414,14 +2418,14 @@ function unserialize(data){
                 }
             break;
             case "a":
-                var readdata = {};
+                var readdata = new Array();
                 
                 var keyandchrs = read_until(data, dataoffset, ':');
                 var chrs = keyandchrs[0];
                 var keys = keyandchrs[1];
                 dataoffset += chrs + 2;
                 
-                for(var i = 0;i < parseInt(keys);i++) {
+                for(var i = 0;i < parseInt(keys);i++){
                     var kprops = _unserialize(data, dataoffset);
                     var kchrs = kprops[1];
                     var key = kprops[2];

@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.15
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.16
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -20,7 +20,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.02.15';
+const VERSION = '2009.02.16';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const BAS_EN_HAUT = 1;
 const HAUT_EN_BAS = 2;
@@ -467,26 +467,28 @@ function rewriteDivs(leftDiv, rightDiv)
                 urls = rightDiv.getElementsByTagName('a');
                 var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
                 for (i=0; i<urls.length;i++) {
-                        if(regURL.test(urls[i].getAttribute('href'))) {
-                                if (readCookie('https')=='1') {
-                                        urls[i].protocol="https:";
-                                } else {
-                                        urls[i].protocol="http:";
-                                }
-                        }
-                        if(urls[i].innerHTML.indexOf('[url]')>0) {
-                                var txtURL = "";
-                                if(urls[i].getAttribute('href')) {
-                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
-                                                regURL = new RegExp(GlobalsTransforUrls[j][0]);
-                                                if(regURL.test(urls[i].getAttribute('href'))) {
-                                                        txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
-                                        		urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>'+txtURL+'</b>');
-							break;
-                                                }
-                                        }
-                                }
-                        } 
+			if (urls[i].getAttribute('href')) {
+	                        if(regURL.test(urls[i].getAttribute('href'))) {
+        	                        if (readCookie('https')=='1') {
+                	                        urls[i].protocol="https:";
+                        	        } else {
+                                	        urls[i].protocol="http:";
+	                                }
+        	                }
+                	        if(urls[i].innerHTML.indexOf('[url]')>0) {
+                        	        var txtURL = "";
+                                	if(urls[i].getAttribute('href')) {
+	                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
+        	                                        regURL = new RegExp(GlobalsTransforUrls[j][0]);
+                	                                if(regURL.test(urls[i].getAttribute('href'))) {
+                        	                                txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
+                                	        		urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>'+txtURL+'</b>');
+								break;
+	                                                }
+        	                                }
+                	                }
+                        	} 
+			}
                 }
                 var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
                 var exp_moules = new RegExp('(moules&lt;)', 'g');

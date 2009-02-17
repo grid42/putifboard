@@ -144,12 +144,6 @@ for(i in global_variables) {
                 GM_setValue('dlfp.' + global_variables[i], value);
         }
 }
-
-// Petit hack 
-if (GM_getValue('dlfp.clignotement')==true || 
-    GM_getValue('dlfp.clignotement')==false) {
-        GM_setValue('dlfp.clignotement','Clignotement');
-}
 delete global_variables;
 
 /* ajout des events listeners */

@@ -463,7 +463,7 @@ function isBoulet(login, message) {
         return (message.match(bak_re)); //'pan ! pan !'));
 }
 
-function BoulayTransformator(left, righDiv) 
+function BoulayTransformator(left, rightDiv) 
 {
 	if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
         	var sentences = new Array("je suis un gros boulet",
@@ -484,6 +484,35 @@ function BoulayTransformator(left, righDiv)
                 addClass(rightDiv, 'boulet') ;
         }
 }
+
+function UrlTransformator(leftDiv, rightDiv)
+{
+	urls = rightDiv.getElementsByTagName('a');
+        var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
+        for (i=0; i<urls.length;i++) {
+        	if(regURL.test(urls[i].getAttribute('href'))) {
+                	if (readCookie('https')=='1') {
+                        	urls[i].protocol="https:";
+                        } else {
+                        	urls[i].protocol="http:";
+                        }
+                }
+                if(urls[i].innerHTML.indexOf('[url]')>0) {
+                	var txtURL = "";
+                        if(urls[i].getAttribute('href')) {
+                        	for(j=0; j<GlobalsTransforUrls.length;j++) {
+                                	regURL = new RegExp(GlobalsTransforUrls[j][0]);
+                                        if(regURL.test(urls[i].getAttribute('href'))) {
+                                        	txtURL += (txtURL==""?'':'-')+GlobalsTransforUrls[j][1];
+                                        }
+                                }
+                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
+                        }
+                }
+	}
+
+}
+
 // Fonction de réécriture de la ligne.
 // C'est beau, c'est gruik, c'est de la bouilli
 function rewriteDivs(leftDiv, rightDiv)
@@ -521,29 +550,7 @@ function rewriteDivs(leftDiv, rightDiv)
                         !GM_getValue('dlfp.chasse')) {
 		BoulayTransformator(leftDiv, rightDiv);
         } else {
-                urls = rightDiv.getElementsByTagName('a');
-                var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
-                for (i=0; i<urls.length;i++) {
-                        if(regURL.test(urls[i].getAttribute('href'))) {
-                                if (readCookie('https')=='1') {
-                                        urls[i].protocol="https:";
-                                } else {
-                                        urls[i].protocol="http:";
-                                }
-                        }
-                        if(urls[i].innerHTML.indexOf('[url]')>0) {
-                                var txtURL = "";
-                                if(urls[i].getAttribute('href')) {
-                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
-                                                regURL = new RegExp(GlobalsTransforUrls[j][0]);
-                                                if(regURL.test(urls[i].getAttribute('href'))) {
-                                                        txtURL += (txtURL==""?'':'-')+GlobalsTransforUrls[j][1];
-                                                }
-                                        }
-                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
-                                }
-                        }
-                }
+		UrlTransformator(leftDiv, rightDiv);
                 var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
                 var exp_moules = new RegExp('(moules&lt;)', 'g');
                 if(exp_login.test(rightDiv.innerHTML) ||

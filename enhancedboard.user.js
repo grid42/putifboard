@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.16
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.17
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -20,7 +20,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.02.16';
+const VERSION = '2009.02.17';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const BAS_EN_HAUT = 1;
 const HAUT_EN_BAS = 2;
@@ -463,6 +463,27 @@ function isBoulet(login, message) {
         return (message.match(bak_re)); //'pan ! pan !'));
 }
 
+function BoulayTransformator(left, righDiv) 
+{
+	if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
+        	var sentences = new Array("je suis un gros boulet",
+                                          "je suis lourd",
+                                          "je suis chauve",
+                                          "je suis un gros abruti",
+                                          "je suis une saucisse",
+                                          "je pue des pieds",
+                                          "j'ai des bords",
+                                          "prout",
+                                          "pika",
+                                          "plop");
+		var s = sentences[Math.floor(Math.random()*sentences.length)];
+                while (rightDiv.innerHTML != (rightDiv.innerHTML = rightDiv.innerHTML.replace(/<[^<>]*>/g, "")));
+                        rightDiv.innerHTML = '<i style="color:#aaa" title="MESSAGE:' + rightDiv.innerHTML + '"><b>-</b> '+s+'</i>';
+        } else if(GM_getValue('dlfp.antibouletmode') == 'putifuto') {
+		addClass(leftDiv, 'boulet') ;
+                addClass(rightDiv, 'boulet') ;
+        }
+}
 // Fonction de réécriture de la ligne.
 // C'est beau, c'est gruik, c'est de la bouilli
 function rewriteDivs(leftDiv, rightDiv)
@@ -498,24 +519,7 @@ function rewriteDivs(leftDiv, rightDiv)
         if (isBoulet(leftDiv.getElementsByTagName('a')[0].textContent,
                                 rightDiv.innerHTML) &&
                         !GM_getValue('dlfp.chasse')) {
-               if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
-                        var sentences = new Array("je suis un gros boulet",
-                                                "je suis lourd",
-                                                "je suis chauve",
-                                                "je suis un gros abruti",
-                                                "je suis une saucisse",
-                                                "je pue des pieds",
-                                                "j'ai des bords",
-                                                "prout",
-                                                "pika",
-                                                "plop");
-                        var s = sentences[Math.floor(Math.random()*sentences.length)];
-                        while (rightDiv.innerHTML != (rightDiv.innerHTML = rightDiv.innerHTML.replace(/<[^<>]*>/g, "")));
-                        rightDiv.innerHTML = '<i style="color:#aaa" title="MESSAGE:' + rightDiv.innerHTML + '"><b>-</b> '+s+'</i>';
-                } else if(GM_getValue('dlfp.antibouletmode') == 'putifuto') {
-                        addClass(leftDiv, 'boulet') ;
-                        addClass(rightDiv, 'boulet') ;
-                }
+		BoulayTransformator(leftDiv, rightDiv);
         } else {
                 urls = rightDiv.getElementsByTagName('a');
                 var regURL = new RegExp('^https?://(www\.)?linuxfr.org');

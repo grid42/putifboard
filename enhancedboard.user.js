@@ -44,6 +44,21 @@ const DEFAULT_MYALERT = false;
 const DEFAULT_INPUTFIXED = true;
 const DEFAULT_MP3 = false;
 const PANEL_WIDTH = 20;
+const HOME_URL = 'http://renardjb.googlepages.com';
+const DEFAULT_GLOBALSTRANSFORURLS = [
+  ['\w*(jpg)$','IMG'],
+  ['\w*(png)$','IMG'],
+  ['^https?://(www\.)?linuxfr\.org','DLFP'],
+  ['^http://(www\.)?google\.(fr|com)','Google'],
+  ['^http://(www\.)?lemonde\.(fr|com)','Le Monde'],
+  ['^http://(www\.)?youtube','YouTube'],
+  ['^http://(www\.)?dailymotion','DailyMotion'],
+  ['^http://(www\.)?whatthemovie','wtm'],
+  ['^http://(www\.)?20minutes','20m'],
+  ['^http://(www\.)?lefigaro','fig'],
+  ['^http://.*yahoo','Ya']
+];
+
 //--- End Section  ---
 
 //--- Define VARIABLES GLOBALE Section ---
@@ -73,9 +88,7 @@ var GlobalBakLogins = new Array();
 // Liste de mots séparés par '|' qui transforme un post en IsBoulet
 var GlobalForbiddenWords = new Array();
 // Liste des transformations d'url
-var GlobalsTransforUrls=[['\w*(jpg)$','IMG'],['\w*(png)$','IMG'],['^https?://(www\.)?linuxfr\.org','DLFP'],['^http://(www\.)?google\.(fr|com)','Google'],['^http://(www\.)?lemonde\.(fr|com)','Le Monde'],['^http://(www\.)?youtube','YouTube'],['^http://(www\.)?dailymotion','DailyMotion'],['^http://(www\.)?whatthemovie','wtm'],['^http://(www\.)?20minutes','20m'],['^http://(www\.)?lefigaro','fig'],
-['^http://.*yahoo','Ya']
-];
+var GlobalsTransforUrls= new Array();
 // Le popup des totoz
 var GlobalPopup = document.createElement('div');
 GlobalPopup.style.display = 'none';
@@ -143,13 +156,17 @@ for(i in global_variables) {
                 GM_setValue('dlfp.' + global_variables[i], value);
         }
 }
-delete global_variables;
 
-// Petit hack 
-if (GM_getValue('dlfp.clignotement')==true || 
-    GM_getValue('dlfp.clignotement')==false) {
-        GM_setValue('dlfp.clignotement','Clignotement');
+/* Define default settings serializer */
+global_variables = ['GlobalsTransforUrls'] ;
+for(i in global_variables) {
+ if(GM_getValue('dlfp.' + global_variables[i]) == null) {
+            value = eval(('DEFAULT_' + global_variables[i]).toUpperCase());
+            GM_setValue('dlfp.' + global_variables[i], serialize(value));
+ }
+ GlobalsTransforUrls=unserialize(GM_getValue('dlfp.' + global_variables[i]));
 }
+delete global_variables;
 
 /* ajout des events listeners */
 global_events = ['load','blur','click','submit','mouseover','mouseout',
@@ -183,7 +200,7 @@ if (readCookie('https')=='1') {
 // Section "OnLoadEvent"
 function addCSS()
 {
-        addGlobalStyle(        '.main {' +
+        addGlobalStyle( '.main {' +
                         'background-color:#ededdb!important;' +
                         'margin:0!important;' +
                         'padding:0!important;' +
@@ -339,17 +356,50 @@ function addCSS()
                         '}' +
                         '.smallmenubar,.lsfnbanner,.menusearch,.boulet {' +
                         'display:none;' +
+                        '}' +
+                        'ul, li{' +
+                        'list-style: none;' +
+                        '}' +
+                        '.myConfigTabs{' +
+                        'float: left;' +
+                        'padding: 2px 10px;' +
+                        'margin-right: 5px;' +
+                        'color: #333;' +
+                        'background: #C4C4C2;' +
+                        'border: 1px solid #B3B3B1;' +
+                        'cursor: pointer;' +
+                        'margin-bottom: -1px;' +
+                        '} ' +
+                        '.myConfigTabs:hover{' +
+                        'background: #D5D5D3;' +
+                        '} ' +
+                        '.myConfigTabs_selected{' +
+                        'float: left;' +
+                        'padding: 2px 10px;' +
+                        'margin-right: 5px;' +
+                        'color: #333;' +
+                        'background: #D5D5D3;' +
+                        'border-top: 1px solid #B3B3B1;' +
+                        'border-right: 1px solid #B3B3B1;' +
+                        'border-left: 1px solid #B3B3B1; ' +
+                        'cursor: pointer; ' +
+                        'margin-bottom: -1px;' +
+                        '}     ' +
+                        '.clear{' +
+                        'clear: both;' +
+                        '}' +
+                        '.mon_contenu{' +
+                        'padding: 10px;    ' +
                         '}');
 
                         if (GM_getValue('dlfp.inputfixed')==true) {
-                                addGlobalStyle(        '.menubar {' +
+                                addGlobalStyle('.menubar {' +
                                 'position:fixed;' +
                                 'top:0;' +
                                 'left:0;' +
                                 'width:100%;' +
                                 '}' );
-                                }
-
+                        }
 }
 
 // Call this function once on onLoad Event
@@ -467,28 +517,25 @@ function rewriteDivs(leftDiv, rightDiv)
                 urls = rightDiv.getElementsByTagName('a');
                 var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
                 for (i=0; i<urls.length;i++) {
-			if (urls[i].getAttribute('href')) {
-	                        if(regURL.test(urls[i].getAttribute('href'))) {
-        	                        if (readCookie('https')=='1') {
-                	                        urls[i].protocol="https:";
-                        	        } else {
-                                	        urls[i].protocol="http:";
-	                                }
-        	                }
-                	        if(urls[i].innerHTML.indexOf('[url]')>0) {
-                        	        var txtURL = "";
-                                	if(urls[i].getAttribute('href')) {
-	                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
-        	                                        regURL = new RegExp(GlobalsTransforUrls[j][0]);
-                	                                if(regURL.test(urls[i].getAttribute('href'))) {
-                        	                                txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
-                                	        		urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>'+txtURL+'</b>');
-								break;
-	                                                }
-        	                                }
-                	                }
-                        	} 
-			}
+                        if(regURL.test(urls[i].getAttribute('href'))) {
+                                if (readCookie('https')=='1') {
+                                        urls[i].protocol="https:";
+                                } else {
+                                        urls[i].protocol="http:";
+                                }
+                        }
+                        if(urls[i].innerHTML.indexOf('[url]')>0) {
+                                var txtURL = "";
+                                if(urls[i].getAttribute('href')) {
+                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
+                                                regURL = new RegExp(GlobalsTransforUrls[j][0]);
+                                                if(regURL.test(urls[i].getAttribute('href'))) {
+                                                        txtURL += (txtURL==""?'':'-')+GlobalsTransforUrls[j][1];
+                                                }
+                                        }
+                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
+                                }
+                        }
                 }
                 var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
                 var exp_moules = new RegExp('(moules&lt;)', 'g');
@@ -572,6 +619,31 @@ function reverseTribune()
         GM_setValue('dlfp.reverse', sens);
         reversePosts();
         rewriteInput();
+}
+
+function addTransforUrl()
+{
+  if (document.getElementById('newRegexURL').value=="" || document.getElementById('newURL').value=="") {
+    alert("Boulet !!!");
+  } else {
+    var a = [[document.getElementById('newRegexURL').value,document.getElementById('newURL').value]];
+    GlobalsTransforUrls=GlobalsTransforUrls.concat(a);
+    GM_setValue('dlfp.GlobalsTransforUrls',serialize(GlobalsTransforUrls));
+    window.location.reload();
+  }
+}
+
+function removeTransforUrl()
+{
+  var result = new Array();
+  for (elemId in GlobalsTransforUrls) {
+    if (document.getElementById('uTransforUrls').value != GlobalsTransforUrls[elemId] && elemId != 'contains' ) {
+      result=result.concat([GlobalsTransforUrls[elemId]]);
+    }
+  }
+  GlobalsTransforUrls=result;  
+  GM_setValue('dlfp.GlobalsTransforUrls',serialize(GlobalsTransforUrls));
+  window.location.reload();
 }
 
 function manageEvent(event)
@@ -734,7 +806,20 @@ function cleanPage()
         elements = evalexp("//div[@class='boardindex']/p[position()<2]");
         elements.snapshotItem(0).innerHTML='';
 }
-
+var idOnglet=0;
+function addOnglet(label) {
+        idOnglet +=1;
+        element = document.createElement('li');
+        element.id="o_"+idOnglet;
+        if (idOnglet==1) {
+          element.setAttribute('class','myConfigTabs_selected');
+        } else {
+          element.setAttribute('class','myConfigTabs');
+        }
+        element.setAttribute('onclick','changeOnglet(this);');
+        element.innerHTML=label;
+        return element;
+}
 function addToolbarIcon(tool_id, img_src, img_title) {
         element = document.createElement('img');
         element.setAttribute('id',tool_id);
@@ -757,6 +842,36 @@ function addToolbarButton(but_id, txt) {
         td_el.appendChild(but);
         tr_el.appendChild(td_el);
         return tr_el;
+}
+
+function addToolbarList(c_id, tab){
+        tr_el = document.createElement('tr');
+        tr_el.setAttribute('class','subpanel');
+        
+        td_el = document.createElement('td');
+        td_el.setAttribute('class','subpanel');
+        td_el.setAttribute('colspan','2');
+
+        but = document.createElement('select');
+        but.setAttribute('id',c_id);
+        but.setAttribute('size',20);
+
+        for(i=0; i< tab.length; i++) {
+                opt = document.createElement('option');
+                opt.innerHTML=tab[i];
+                but.appendChild(opt);
+        }
+
+        td_el.appendChild(but);
+        
+        but = document.createElement('button');
+        but.setAttribute('id','uSupTransforUrl');
+        but.setAttribute('name','uSupTransforUrl');
+        but.setAttribute('value','Supprimer');
+        but.innerHTML='Supprimer';
+        td_el.appendChild(but);
+        tr_el.appendChild(td_el);
+        return tr_el
 }
 
 function addToolbarCheckBox(c_id, txt, val) {
@@ -846,76 +961,105 @@ function displayPanel()
         expandLink.setAttribute('id','panelLinks');
 
         expandLink.appendChild(addToolbarIcon('refresh',
-                                'http://renardjb.googlepages.com/refresh_16x16.png',
+                                HOME_URL + '/refresh_16x16.png',
                                 'Allons à la pêche aux trolls'));
         expandLink.appendChild(addToolbarIcon('configZoneLink',
-                                'http://renardjb.googlepages.com/Settings-16x16.png',
+                                HOME_URL + '/Settings-16x16.png',
                                 'Configuration'));
         expandLink.appendChild(addToolbarIcon('uUpdate',
-                                'http://renardjb.googlepages.com/web_16x16.png',
+                                HOME_URL + '/web_16x16.png',
                                 'A moi les fritures'));
-        
-        hiddenPanel = document.createElement('table');
-        hiddenPanel.setAttribute('class','subpanel');
+        hiddenPanel = document.createElement('div');
         hiddenPanel.setAttribute('id','configZone');
         hiddenPanel.style.display = 'none';
+        mes_onglets = document.createElement('div');
+        mes_onglets.id="mes_onglets";
+        ongletMenu = document.createElement('ul');
+        ongletMenu.appendChild(addOnglet('Configuration'));
+        ongletMenu.appendChild(addOnglet('URL Transform'));
+        mes_onglets.appendChild(ongletMenu);
+        hiddenPanel.appendChild(mes_onglets);
+        mes_contenus = document.createElement('div');
+        mes_contenus.id="mes_contenus";
+        onglet1 = document.createElement('div');
+        onglet1.id="co_1";
+        onglet1.setAttribute('class','mon_contenu');
+        panelOnglet1 = document.createElement('table');
+        panelOnglet1.setAttribute('class','subpanel');
+        panelOnglet1.setAttribute('id','configPanel');
         
-        hiddenPanel.appendChild(addToolbarButton('sens','Retourner la tribune'));
+        panelOnglet1.appendChild(addToolbarButton('sens','Retourner la tribune'));
         
-        hiddenPanel.appendChild(addToolbarCheckBox('uautorefresh',
+        panelOnglet1.appendChild(addToolbarCheckBox('uautorefresh',
                                 'Auto Refresh', 
                                 GM_getValue('dlfp.autorefresh')));
-        hiddenPanel.appendChild(addToolbarTextBox('timeoutinput',
+        panelOnglet1.appendChild(addToolbarTextBox('timeoutinput',
                                 'Déclencheur', 
                                 GM_getValue('dlfp.timeout')/1000,3));
-        hiddenPanel.appendChild(addToolbarTextBox('uainput',
+        panelOnglet1.appendChild(addToolbarTextBox('uainput',
                                 'User-Agent', 
                                 GM_getValue('dlfp.ua'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('uBakinput',
+        panelOnglet1.appendChild(addToolbarTextBox('uBakinput',
                                 'BoitAkon', 
                                 GM_getValue('dlfp.baklogins'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('uforbiddenWord',
+        panelOnglet1.appendChild(addToolbarTextBox('uforbiddenWord',
                                 'Mots censurés', 
                                 GM_getValue('dlfp.forbiddenwords'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('titleinput',
+        panelOnglet1.appendChild(addToolbarTextBox('titleinput',
                                 'Titre', 
                                 document.title,50));
-        hiddenPanel.appendChild(addToolbarTextBox('faviconinput',
+        panelOnglet1.appendChild(addToolbarTextBox('faviconinput',
                                 'Favicon', 
                                 GM_getValue('dlfp.favicon'),50));
-        hiddenPanel.appendChild(addToolbarCheckBox('uchasse',
+        panelOnglet1.appendChild(addToolbarCheckBox('uchasse',
                                 'Chasse ouverte', 
                                 GM_getValue('dlfp.chasse')));
-        hiddenPanel.appendChild(addToolbarSelectBox('ubouletmode',
+        panelOnglet1.appendChild(addToolbarSelectBox('ubouletmode',
                                 'Mode de filtrage', 
                                 ['putifuto','nedflan'], 
                                 GM_getValue('dlfp.antibouletmode'),50));
-        hiddenPanel.appendChild(addToolbarSelectBox('utotozmode',
+        panelOnglet1.appendChild(addToolbarSelectBox('utotozmode',
                                 'Totoz', 
                                 ['popup','inline'], 
                                 GM_getValue('dlfp.totoz'),50));
-        hiddenPanel.appendChild(addToolbarTextBox('utotozsrv',
+        panelOnglet1.appendChild(addToolbarTextBox('utotozsrv',
                                 'Serveur totoz', 
                                 GM_getValue('dlfp.totozsrv'),50));
-        hiddenPanel.appendChild(addToolbarSelectBox('uclignotement',
+        panelOnglet1.appendChild(addToolbarSelectBox('uclignotement',
                                 'Alerte',
                                 ['Inactif','Simple','Clignotement'], 
                                 GM_getValue('dlfp.clignotement')));
-        hiddenPanel.appendChild(addToolbarCheckBox('umyalert',
+        panelOnglet1.appendChild(addToolbarCheckBox('umyalert',
                                 'Alertes égoïstes', 
                                 GM_getValue('dlfp.myalert')));
-        hiddenPanel.appendChild(addToolbarCheckBox('uinputfixed',
+        panelOnglet1.appendChild(addToolbarCheckBox('uinputfixed',
                                 'Formulaire fixe', 
                                 GM_getValue('dlfp.inputfixed')));
-        hiddenPanel.appendChild(addToolbarCheckBox('ump3',
+        panelOnglet1.appendChild(addToolbarCheckBox('ump3',
                                 'Musique', 
                                 GM_getValue('dlfp.mp3')));
 
-        hiddenPanel.innerHTML += '<tr class="subpanel">'+
+        panelOnglet1.innerHTML += '<tr class="subpanel">'+
                 '<td style="text-align:right;color:gray;top:3px;" '+
                 'class="subpanel" colspan="2">'+
-                'Current version : <a href="http://renardjb.googlepages.com/">' + VERSION + '</a></td></tr>';
-
+                'Current version : <a href="' + HOME_URL + '">' + VERSION + '</a></td></tr>';
+        onglet1.appendChild(panelOnglet1);
+        mes_contenus.appendChild(onglet1);
+        
+        onglet2 = document.createElement('div');
+        onglet2.id="co_2";
+        onglet2.setAttribute('class','mon_contenu');
+        onglet2.setAttribute('style','display: none;');
+        panelOnglet2 = document.createElement('table');
+        panelOnglet2.setAttribute('class','subpanel');
+        panelOnglet2.setAttribute('id','urlTransform');
+        panelOnglet2.appendChild(addToolbarTextBox('newRegexURL','Nouvelle RegEx','',50));
+        panelOnglet2.appendChild(addToolbarTextBox('newURL','Tag','',50));
+        panelOnglet2.appendChild(addToolbarButton('uAddTransforUrl','Ajouter la règle'));
+        panelOnglet2.appendChild(addToolbarList('uTransforUrls',GlobalsTransforUrls));
+        onglet2.appendChild(panelOnglet2);
+        mes_contenus.appendChild(onglet2);
+        hiddenPanel.appendChild(mes_contenus);
         panel.appendChild(expandLink);
         panel.appendChild(hiddenPanel);
 }
@@ -1029,12 +1173,30 @@ function addGlobalStyle(css)
         style.type = 'text/css';
         style.innerHTML = css;
         head.appendChild(style);
-
-        //scp = document.createElement('script');
-        //scp.setAttribute('language','javascript');
-        //scp.setAttribute('src','http://scripts.url2thumb.com/thumbnails/thumbs.js?border=004891');
-        //scp.setAttribute('type','text/javascript');
-        //document.getElementsByTagName('body')[0].appendChild(scp);
+}
+function addGlobalScript()
+{
+        var head, style;
+        head = document.getElementsByTagName('head')[0];
+        if (!head) { return; }
+        element = document.createElement('script');
+        element.setAttribute('type','text/javascript');
+        element.innerHTML = 'function changeOnglet(_this){'+
+        'var getOnglets  = document.getElementById("mes_onglets").getElementsByTagName("li");'+
+        'for(var i = 0; i < getOnglets.length; i++){'+
+        'if(getOnglets[i].id){'+
+        'if(getOnglets[i].id == _this.id){'+
+        'getOnglets[i].className = "myConfigTabs_selected";'+
+        'document.getElementById("c" + _this.id).style.display    = "block";'+
+        '}'+
+        'else{'+
+        'getOnglets[i].className = "myConfigTabs";'+
+        'document.getElementById("c" + getOnglets[i].id).style.display  = "none";'+
+        '}'+
+        '}'+
+        '}'+
+        '}';
+  head.appendChild(element);
 }
 
 /* events handling functions */
@@ -1063,6 +1225,7 @@ function onLoad()
         }
         cleanPage();
         addCSS();
+        addGlobalScript();
         createCustomElements();
         displayPanel();
         onLoadGetMessages();
@@ -1433,6 +1596,10 @@ function onChange(event)
                 window.location.reload();
         } else if(event.target.id == 'message') {
                 // non traitée
+        } else if(event.target.id == 'newRegexURL') {
+                // non traitée
+        } else if(event.target.id == 'newURL') {
+        } else if(event.target.id == 'uTransforUrls') {
         } else {
                         alert("ERROR " + event.target.id);
         }
@@ -1451,6 +1618,8 @@ function onFocus(event)
                 case 'titleinput':
                 case 'faviconinput' :
                 case 'utotozsrv':
+                case 'newRegexURL':
+                case 'newURL':
                         GlobalIsTyping = true;
                         break;
                 case 'message':
@@ -1474,7 +1643,7 @@ function onClick(event)
                         }
                         return true;
                 case 'uUpdate':
-                        window.location = 'http://renardjb.googlepages.com/enhancedboard.user.js';
+                        window.location = HOME_URL + '/enhancedboard.user.js';
                         event.stopPropagation();
                         return true;
                 case 'configZoneLink':
@@ -1493,11 +1662,16 @@ function onClick(event)
                                 reverseTribune();
                         }
                         return true;
+                case 'uAddTransforUrl':
+                        addTransforUrl();
+                        return true;
+                case 'uSupTransforUrl':
+                        removeTransforUrl();
+                        return true;
                 default:
         }
         switch(nodeName) {
                 case 'span':
-//                        'ENCOURS
                         if(nodeClass.indexOf('horloge',0)!=-1) {
                                 queryLeft = '//div[starts-with(@class,\'boardleftmsg\') and contains(@class,\'highlighted\')]';
                                 var allLeftDiv = evalexp(queryLeft);
@@ -1518,30 +1692,28 @@ function onClick(event)
                                                 GlobalClickTimer = setInterval(highlightedClick,100);
                                         }
                                 }
+                        } else if(nodeClass.indexOf('canard',0)!=-1) {
+                          if (target.parentNode.nodeName.toLowerCase() == 'div' &&
+                              getClass(target.parentNode).match('boardrightmsg')) {
+                                clockId = getId(target.parentNode);
+                                horlogeToInsert = clockId.substring(0,8);
+                                indice = parseInt(clockId.charAt(8));
+                                exposant = '';
+                                if(indice > 1 && indice < 4) {
+                                        exposant = String.fromCharCode(176 + indice); 
+                                } else if(indice > 3) {
+                                        exposant = '^' + indice
+                                } else {
+                                        if(document.getElementById(horlogeToInsert + (indice + 1))) {
+                                                exposant = String.fromCharCode(185);
+                                        }
+                                }
+                                horlogeToInsert = horlogeToInsert + exposant;
+                                appendTextToMessage(horlogeToInsert + ' pan ! pan ! ');
+                          }
                         }
-      else if(nodeClass.indexOf('canard',0)!=-1) {
-        if (target.parentNode.nodeName.toLowerCase() == 'div' && getClass(target.parentNode).match('boardrightmsg')) {
-          clockId = getId(target.parentNode);
-          horlogeToInsert = clockId.substring(0,8);
-          indice = parseInt(clockId.charAt(8));
-          exposant = '';
-          if(indice > 1 && indice < 4) {
-                  exposant = String.fromCharCode(176 + indice); 
-          } else if(indice > 3) {
-                  exposant = '^' + indice
-          } else {
-                  // Existe-t-il un id = 1
-                  if(document.getElementById(horlogeToInsert + (indice + 1))) {
-                          exposant = String.fromCharCode(185);
-                  }
-          }
-          horlogeToInsert = horlogeToInsert + exposant;
-          appendTextToMessage(horlogeToInsert + ' pan ! pan ! ');
-        }
-      }
                         break;
                 case 'div':
-                        
                         break;
                 case 'input':
                         if(GlobalIsFortuning && GlobalIsFortuned) {
@@ -1558,12 +1730,15 @@ function onClick(event)
                 case 'a':
                         break;
                 case 'b':
-                        if( (target.parentNode.nodeName.toLowerCase() == 'div' && getClass(target.parentNode).match('boardleftmsg'))
-                        || (target.parentNode.nodeName.toLowerCase() == 'span' && getClass(target.parentNode) == 'bigorno') ) {
-                                if(target.parentNode.nodeName.toLowerCase() == 'span' && getClass(target.parentNode) == 'bigorno') {
+                        if( (target.parentNode.nodeName.toLowerCase() == 'div' && 
+                             getClass(target.parentNode).match('boardleftmsg'))
+                                || 
+                            (target.parentNode.nodeName.toLowerCase() == 'span' && 
+                             getClass(target.parentNode) == 'bigorno') ) {
+                                if(target.parentNode.nodeName.toLowerCase() == 'span' &&
+                                   getClass(target.parentNode) == 'bigorno') {
                                         clockId = getId(target.parentNode.parentNode);
-                                }
-                                else {
+                                } else {
                                         clockId = getId(target.parentNode);
                                 }
                                 horlogeToInsert = clockId.substring(0,8);
@@ -1727,7 +1902,6 @@ function unhighlightLeftHorloge(id)
 /* slip GET & POST functions */
 function refreshSlip()
 {
-
         if(!GlobalReverseInProgress) {
                 window.clearInterval(GlobalRefreshTimerId);
                 GlobalTimer.style.display='';
@@ -1756,8 +1930,6 @@ function slipProgress(event){};
 function slipError(event){
         GlobalTimer.style.display='none';
         initRefresh();
-//        GlobalRefreshTimerId = window.setInterval(refreshSlip,
-//                                                GM_getValue('dlfp.timeout'));
 };
 function slipLoaded(details)
 {
@@ -1857,8 +2029,6 @@ function slipLoaded(details)
         document.getElementById('refresh').style.color = 'black';
         GlobalTimer.style.display='none';
         initRefresh();
-        //GlobalRefreshTimerId = window.setInterval(refreshSlip,
-        //                                        GM_getValue('dlfp.timeout'));
 }
 
 function postToSlip(inputField)
@@ -2074,3 +2244,253 @@ function getSelectedText(){
         base = document.getElementById("message");
         return base.value.substring(base.selectionStart, base.selectionEnd);
 }
+
+function serialize( mixed_value ) {
+    // http://kevin.vanzonneveld.net
+    // +   original by: Arpad Ray (mailto:arpad@php.net)
+    // +   improved by: Dino
+    // +   bugfixed by: Andrej Pavlovic
+    // +   bugfixed by: Garagoth
+    // %          note: We feel the main purpose of this function should be to ease the transport of data between php & js
+    // %          note: Aiming for PHP-compatibility, we have to translate objects to arrays
+    // *     example 1: serialize(['Kevin', 'van', 'Zonneveld']);
+    // *     returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
+    // *     example 2: serialize({firstName: 'Kevin', midName: 'van', surName: 'Zonneveld'});
+    // *     returns 2: 'a:3:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";s:7:"surName";s:9:"Zonneveld";}'
+ 
+    var _getType = function( inp ) {
+        var type = typeof inp, match;
+        var key;
+        if (type == 'object' && !inp) {
+            return 'null';
+        }
+        if (type == "object") {
+            if (!inp.constructor) {
+                return 'object';
+            }
+            var cons = inp.constructor.toString();
+            if (match = cons.match(/(\w+)\(/)) {
+                cons = match[1].toLowerCase();
+            }
+            var types = ["boolean", "number", "string", "array"];
+            for (key in types) {
+                if (cons == types[key]) {
+                    type = types[key];
+                    break;
+                }
+            }
+        }
+        return type;
+    };
+    var type = _getType(mixed_value);
+    var val, ktype = '';
+    
+    switch (type) {
+        case "function": 
+            val = ""; 
+            break;
+        case "undefined":
+            val = "N";
+            break;
+        case "boolean":
+            val = "b:" + (mixed_value ? "1" : "0");
+            break;
+        case "number":
+            val = (Math.round(mixed_value) == mixed_value ? "i" : "d") + ":" + mixed_value;
+            break;
+        case "string":
+            val = "s:" + mixed_value.length + ":\"" + mixed_value + "\"";
+            break;
+        case "array":
+        case "object":
+            val = "a";
+            var count = 0;
+            var vals = "";
+            var okey;
+            var key;
+            for (key in mixed_value) {
+                ktype = _getType(mixed_value[key]);
+                if (ktype == "function") { 
+                    continue; 
+                }
+                
+                okey = (key.match(/^[0-9]+$/) ? parseInt(key) : key);
+                vals += serialize(okey) +
+                        serialize(mixed_value[key]);
+                count++;
+            }
+            val += ":" + count + ":{" + vals + "}";
+            break;
+    }
+    if (type != "object" && type != "array") val += ";";
+    return val;
+}
+
+
+
+/**
+* o------------------------------------------------------------------------------o
+* | This package is licensed under the Phpguru license 2008. A quick summary is  |
+* | that the code is free to use for non-commercial purposes. For commercial     |
+* | purposes of any kind there is a small license fee to pay. You can read more  |
+* | at:                                                                          |
+* |                  http://www.phpguru.org/static/license.html                  |
+* o------------------------------------------------------------------------------o
+*
+* © Copyright 2008 Richard Heyes
+*/
+
+/**
+* Unserializes a PHP serialized data type. Currently handles:
+*  o Strings
+*  o Integers
+*  o Doubles
+*  o Arrays
+*  o Booleans
+*  o NULL
+*  o Objects
+* 
+* alert()s will be thrown if the function is passed something it
+* can't handle or incorrect data.
+*
+* @param  string input The serialized PHP data
+* @return mixed        The resulting datatype
+*/
+function unserialize(input)
+{
+        var result = PHP_Unserialize_(input);
+        return result[0];
+}
+
+/**
+* Function which performs the actual unserializing
+*
+* @param string input Input to parse
+*/
+function PHP_Unserialize_(input)
+{
+        var length = 0;
+        
+        switch (input.charAt(0)) {
+            /**
+            * Array
+            */
+            case 'a':
+                length = PHP_Unserialize_GetLength(input);
+                input  = input.substr(String(length).length + 4);
+
+                var arr   = new Array();
+                var key   = null;
+                var value = null;
+
+                for (var i=0; i<length; ++i) {
+                    key   = PHP_Unserialize_(input);
+                    input = key[1];
+
+                    value = PHP_Unserialize_(input);
+                    input = value[1];
+
+                    arr[key[0]] = value[0];
+                }
+
+                input = input.substr(1);
+                return [arr, input];
+                break;
+            
+            /**
+            * Objects
+            */
+            case 'O':
+                length = PHP_Unserialize_GetLength(input);
+                var classname = String(input.substr(String(length).length + 4, length));
+                
+                input  = input.substr(String(length).length + 6 + length);
+                var numProperties = Number(input.substring(0, input.indexOf(':')))
+                input = input.substr(String(numProperties).length + 2);
+
+                var obj      = new Object();
+                var property = null;
+                var value    = null;
+
+                for (var i=0; i<numProperties; ++i) {
+                    key   = PHP_Unserialize_(input);
+                    input = key[1];
+                    
+                    // Handle private/protected
+                    key[0] = key[0].replace(new RegExp('^\x00' + classname + '\x00'), '');
+                    key[0] = key[0].replace(new RegExp('^\x00\\*\x00'), '');
+
+                    value = PHP_Unserialize_(input);
+                    input = value[1];
+
+                    obj[key[0]] = value[0];
+                }
+
+                input = input.substr(1);
+                return [obj, input];
+                break;
+
+            /**
+            * Strings
+            */
+            case 's':
+                length = PHP_Unserialize_GetLength(input);
+                return [String(input.substr(String(length).length + 4, length)), input.substr(String(length).length + 6 + length)];
+                break;
+
+            /**
+            * Integers and doubles
+            */
+            case 'i':
+            case 'd':
+                var num = Number(input.substring(2, input.indexOf(';')));
+                return [num, input.substr(String(num).length + 3)];
+                break;
+            
+            /**
+            * Booleans
+            */
+            case 'b':
+                var bool = (input.substr(2, 1) == 1);
+                return [bool, input.substr(4)];
+                break;
+            
+            /**
+            * Null
+            */
+            case 'N':
+                return [null, input.substr(2)];
+                break;
+
+            /**
+            * Unsupported
+            */
+            case 'o':
+            case 'r':
+            case 'C':
+            case 'R':
+            case 'U':
+                alert('Error: Unsupported PHP data type found!');
+
+            /**
+            * Error
+            */
+            default:
+                return [null, null];
+                break;
+        }
+    }
+    
+
+    /**
+    * Returns length of strings/arrays etc
+    *
+    * @param string input Input to parse
+    */
+    function PHP_Unserialize_GetLength(input)
+    {
+        input = input.substring(2);
+        var length = Number(input.substr(0, input.indexOf(':')));
+        return length;
+    }
+

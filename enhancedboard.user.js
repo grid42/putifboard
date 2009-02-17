@@ -976,13 +976,13 @@ function displayPanel()
         hiddenPanel.style.display = 'none';
         ConfigsTabs = document.createElement('div');
         ConfigsTabs.id="ConfigsTabs";
-        ongletMenu = document.createElement('ul');
-        ongletMenu.appendChild(addOnglet('Configuration'));
-        ongletMenu.appendChild(addOnglet('URL Transform'));
-        ConfigsTabs.appendChild(ongletMenu);
+        configTabMenu = document.createElement('ul');
+        configTabMenu.appendChild(addOnglet('Configuration'));
+        configTabMenu.appendChild(addOnglet('URL Transform'));
+        ConfigsTabs.appendChild(configTabMenu);
         hiddenPanel.appendChild(ConfigsTabs);
-        mes_contenus = document.createElement('div');
-        mes_contenus.id="mes_contenus";
+        ContentItems = document.createElement('div');
+        ContentItems.id="ContentItems";
         onglet1 = document.createElement('div');
         onglet1.id="co_1";
         onglet1.setAttribute('class','mon_contenu');
@@ -1046,7 +1046,7 @@ function displayPanel()
                 'class="subpanel" colspan="2">'+
                 'Current version : <a href="' + HOME_URL + '">' + VERSION + '</a></td></tr>';
         onglet1.appendChild(panelOnglet1);
-        mes_contenus.appendChild(onglet1);
+        ContentItems.appendChild(onglet1);
         
         onglet2 = document.createElement('div');
         onglet2.id="co_2";
@@ -1060,8 +1060,8 @@ function displayPanel()
         panelOnglet2.appendChild(addToolbarButton('uAddTransforUrl','Ajouter la règle'));
         panelOnglet2.appendChild(addToolbarList('uTransforUrls',GlobalsTransforUrls));
         onglet2.appendChild(panelOnglet2);
-        mes_contenus.appendChild(onglet2);
-        hiddenPanel.appendChild(mes_contenus);
+        ContentItems.appendChild(onglet2);
+        hiddenPanel.appendChild(ContentItems);
         panel.appendChild(expandLink);
         panel.appendChild(hiddenPanel);
 }

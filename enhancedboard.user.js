@@ -463,56 +463,6 @@ function isBoulet(login, message) {
         return (message.match(bak_re)); //'pan ! pan !'));
 }
 
-// transforme un post en boulet, suivant le mode
-function BouletRightDivTransformator( rightDiv) {
-        if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
-                var sentences = new Array("je suis un gros boulet",
-                                          "je suis lourd",
-                                          "je suis chauve",
-                                          "je suis un gros abruti",
-                                          "je suis une saucisse",
-                                          "je pue des pieds",
-                                          "j'ai des bords",
-                                          "prout",
-                                          "pika",
-                                          "plop");
-                var s = sentences[Math.floor(Math.random()*sentences.length)];
-                while (rightDiv.innerHTML != (rightDiv.innerHTML = rightDiv.innerHTML.replace(/<[^<>]*>/g, "")));
-                        rightDiv.innerHTML = '<i style="color:#aaa" title="MESSAGE:' + rightDiv.innerHTML + '"><b>-</b> '+s+'</i>';
-        } else if(GM_getValue('dlfp.antibouletmode') == 'putifuto') {
-                addClass(leftDiv, 'boulet') ;
-                addClass(rightDiv, 'boulet') ;
-        }
-}
-
-function UrlTransformator(rightDiv) {
-        urls = rightDiv.getElementsByTagName('a');
-        var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
-        for (i=0; i<urls.length;i++) {
-                if (urls[i].getAttribute('href')) {
-                        if(regURL.test(urls[i].getAttribute('href'))) {
-                                if (readCookie('https')=='1') {
-                                        urls[i].protocol="https:";
-                                } else {
-                                        urls[i].protocol="http:";
-                                }
-                        }
-                        if(urls[i].innerHTML.indexOf('[url]')>0) {
-                                var txtURL = "";
-                                if(urls[i].getAttribute('href')) {
-                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
-                                                regURL = new RegExp(GlobalsTransforUrls[j][0]);
-                                                if(regURL.test(urls[i].getAttribute('href'))) {
-                                                        txtURL += '<b>['+GlobalsTransforUrls[j][1]+']</b>';
-                                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>'+txtURL+'</b>');
-                                                        break;
-                                                }
-                                        }
-                                } 
-                        }
-                }
-        }
-}
 // Fonction de réécriture de la ligne.
 // C'est beau, c'est gruik, c'est de la bouilli
 function rewriteDivs(leftDiv, rightDiv)
@@ -548,30 +498,64 @@ function rewriteDivs(leftDiv, rightDiv)
         if (isBoulet(leftDiv.getElementsByTagName('a')[0].textContent,
                                 rightDiv.innerHTML) &&
                         !GM_getValue('dlfp.chasse')) {
-                BouletRightDivTransformator(rightDiv);
+               if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
+                        var sentences = new Array("je suis un gros boulet",
+                                                "je suis lourd",
+                                                "je suis chauve",
+                                                "je suis un gros abruti",
+                                                "je suis une saucisse",
+                                                "je pue des pieds",
+                                                "j'ai des bords",
+                                                "prout",
+                                                "pika",
+                                                "plop");
+                        var s = sentences[Math.floor(Math.random()*sentences.length)];
+                        while (rightDiv.innerHTML != (rightDiv.innerHTML = rightDiv.innerHTML.replace(/<[^<>]*>/g, "")));
+                        rightDiv.innerHTML = '<i style="color:#aaa" title="MESSAGE:' + rightDiv.innerHTML + '"><b>-</b> '+s+'</i>';
+                } else if(GM_getValue('dlfp.antibouletmode') == 'putifuto') {
+                        addClass(leftDiv, 'boulet') ;
+                        addClass(rightDiv, 'boulet') ;
+                }
         } else {
-                UrlTransformator(rightDiv);
-                BigornoTransformator(rightDiv);
-                
-        }
-}
-
-function BigornoTransformator(rightDiv) {
-        var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
-        var exp_moules = new RegExp('(moules&lt;)', 'g');
-        if(exp_login.test(rightDiv.innerHTML) ||
-                exp_moules.test(rightDiv.innerHTML)) {
-                leftDiv.innerHTML = '<span class="bigorno">' + 
-                leftDiv.innerHTML + '</span>';
-                rightDiv.innerHTML = '<span class="bigorno">' +
+                urls = rightDiv.getElementsByTagName('a');
+                var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
+                for (i=0; i<urls.length;i++) {
+                        if(regURL.test(urls[i].getAttribute('href'))) {
+                                if (readCookie('https')=='1') {
+                                        urls[i].protocol="https:";
+                                } else {
+                                        urls[i].protocol="http:";
+                                }
+                        }
+                        if(urls[i].innerHTML.indexOf('[url]')>0) {
+                                var txtURL = "";
+                                if(urls[i].getAttribute('href')) {
+                                        for(j=0; j<GlobalsTransforUrls.length;j++) {
+                                                regURL = new RegExp(GlobalsTransforUrls[j][0]);
+                                                if(regURL.test(urls[i].getAttribute('href'))) {
+                                                        txtURL += (txtURL==""?'':'-')+GlobalsTransforUrls[j][1];
+                                                }
+                                        }
+                                        urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
+                                }
+                        }
+                }
+                var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
+                var exp_moules = new RegExp('(moules&lt;)', 'g');
+                if(exp_login.test(rightDiv.innerHTML) ||
+                   exp_moules.test(rightDiv.innerHTML)) {
+                        leftDiv.innerHTML = '<span class="bigorno">' + 
+                                leftDiv.innerHTML + '</span>';
+                        rightDiv.innerHTML = '<span class="bigorno">' +
                                 rightDiv.innerHTML + '</span>'; 
-                postAlert();
-        }
-        if (GM_getValue('dlfp.myalert')!=true) { 
-                postAlert();
-        } else {
-                if(rightDiv.innerHTML.indexOf('myPost')!=-1) {
                         postAlert();
+                }
+                if (GM_getValue('dlfp.myalert')!=true) { 
+                        postAlert();
+                } else {
+                        if(rightDiv.innerHTML.indexOf('myPost')!=-1) {
+                                postAlert();
+                        }
                 }
         }
 }

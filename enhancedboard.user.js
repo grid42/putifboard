@@ -975,13 +975,13 @@ function displayPanel()
         expandLink.setAttribute('id','panelLinks');
 
         expandLink.appendChild(addToolbarIcon('refresh',
-                                HOME_URL + '/refresh_16x16.png',
+                                'http://pycoincoin.free.fr/onlinecc/img/refreshall.png',
                                 'Allons à la pêche aux trolls'));
         expandLink.appendChild(addToolbarIcon('configZoneLink',
-                                HOME_URL + '/Settings-16x16.png',
+                                'http://pycoincoin.free.fr/onlinecc/img/config.png',
                                 'Configuration'));
         expandLink.appendChild(addToolbarIcon('uUpdate',
-                                HOME_URL + '/web_16x16.png',
+				'http://pycoincoin.free.fr/onlinecc/img/bconfig.png',
                                 'A moi les fritures'));
         hiddenPanel = document.createElement('div');
         hiddenPanel.setAttribute('id','configZone');

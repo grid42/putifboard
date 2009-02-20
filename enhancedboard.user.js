@@ -490,6 +490,7 @@ function UrlTransformator(leftDiv, rightDiv)
 	urls = rightDiv.getElementsByTagName('a');
         var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
         for (i=0; i<urls.length;i++) {
+		urls[i].setAttribute('target','_blank');
         	if(regURL.test(urls[i].getAttribute('href'))) {
                 	if (readCookie('https')=='1') {
                         	urls[i].protocol="https:";
@@ -1482,19 +1483,32 @@ function onKeyPress(event)
                                 event.stopPropagation();
                                 event.preventDefault();
                 } else if(event.keyCode==13) {
-                                GlobalKeyModeInProgress = true;
-                                queryLeft = '//div[contains(@class,\'boardleftmsg\') and contains(@class,\'highlighted\')]';
+                        GlobalKeyModeInProgress = true;
+                        queryLeft = '//div[contains(@class,\'boardleftmsg\') and contains(@class,\'highlighted\')]';
 
-                                var allLeftDiv = evalexp(queryLeft);
-                                for (var i = 0; i < allLeftDiv.snapshotLength; i++) {
-                                        appendTextToMessage(allLeftDiv.snapshotItem(i).getElementsByTagName('b')[0].innerHTML);
-                                        appendTextToMessage(' ');
-                                }
-                                event.stopPropagation();
-                                event.preventDefault();
+                        var allLeftDiv = evalexp(queryLeft);
+                        for (var i = 0; i < allLeftDiv.snapshotLength; i++) {
+                        	appendTextToMessage(allLeftDiv.snapshotItem(i).getElementsByTagName('b')[0].innerHTML);
+                                appendTextToMessage(' ');
+                        }
+                        event.stopPropagation();
+                        event.preventDefault();
 
+                } else if(event.keyCode==36) { // Touche HOME
+                        event.stopPropagation();
+                        event.preventDefault();
+                        queryLeft = '//div[contains(@class,\'boardrightmsg\') and contains(@class,\'highlighted\')]';
+
+                        var allLeftDiv = evalexp(queryLeft);
+                        for (var i = 0; i < allLeftDiv.snapshotLength; i++) {
+				collec = allLeftDiv.snapshotItem(i).getElementsByTagName('a');
+				for(var j in collec) {
+					window.open(collec[j]);
+				}
+                        }
+			alert('stop');
                 } else {
-                        _log(event.keyCode);
+                        GM_log(event.keyCode);
                 }
         }
 

@@ -1506,7 +1506,6 @@ function onKeyPress(event)
 					window.open(collec[j]);
 				}
                         }
-			alert('stop');
                 } else {
                         GM_log(event.keyCode);
                 }

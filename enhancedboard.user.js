@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.17
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.18
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -20,7 +20,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.02.17';
+const VERSION = '2009.02.18';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const BAS_EN_HAUT = 1;
 const HAUT_EN_BAS = 2;

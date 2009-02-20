@@ -14,7 +14,7 @@
 // @include        https://www.linuxfr.org/board/*
 // ==/UserScript==
 
-// Changelog : http://renardjb.googlepages.com/changelog
+// Changelog :  http://pqcc.free.fr/news/index.php?Putifboard
 
 // Enable log
 GM_setValue('dlfp.debug',0);
@@ -43,7 +43,7 @@ const DEFAULT_CLIGNOTEMENT = 'clignotement';
 const DEFAULT_MYALERT = false;
 const DEFAULT_INPUTFIXED = true;
 const DEFAULT_MP3 = false;
-const HOME_URL = 'http://renardjb.googlepages.com';
+const HOME_URL = 'http://pqcc.free.fr/news/';
 const PANEL_WIDTH = 20;
 const DEFAULT_GLOBALSTRANSFORURLS = [
   ['\w*(jpg)$','IMG'],
@@ -1670,7 +1670,7 @@ function onClick(event)
                         }
                         return true;
                 case 'uUpdate':
-                        window.location = HOME_URL + '/enhancedboard.user.js';
+                        window.location = 'http://pqcc.free.fr/news/share/minifilemanager/enhancedboard.user.js';
                         event.stopPropagation();
                         return true;
                 case 'configZoneLink':

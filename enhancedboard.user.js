@@ -12,6 +12,8 @@
 // @include        https://linuxfr.org/board/*
 // @include        https://www.linuxfr.org/board
 // @include        https://www.linuxfr.org/board/*
+//
+// Contact : pqcc free.fr
 // ==/UserScript==
 
 // Changelog :  http://pqcc.free.fr/news/index.php?Putifboard

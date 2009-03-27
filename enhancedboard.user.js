@@ -83,8 +83,6 @@ var GlobalReverseInProgress = false;
 var GlobalKeyModeInProgress = false;
 // Contient le cache des totoz
 var GlobalArrayTotoz = new Array();
-// Contient une référence des posts du posteur
-var GlobalArrayMyPosts = new Array();
 // Permet de définir les personnes indésirables (séparé par '|')
 var GlobalBakLogins = new Array();
 // Liste de mots séparés par '|' qui transforme un post en IsBoulet
@@ -535,10 +533,6 @@ function rewriteDivs(leftDiv, rightDiv)
         }
         if(login == readCookie('login')) {
                 addClass(leftDiv,'myPost');
-                GlobalArrayMyPosts[GlobalArrayMyPosts.length] = 
-                        horloge + currentHorlogeNumber;
-                GlobalArrayMyPosts[GlobalArrayMyPosts.length] = 
-                        horloge.substring(0,5);
         }
         setId(leftDiv, horloge + currentHorlogeNumber);
         setId(rightDiv, horloge + currentHorlogeNumber);
@@ -2202,9 +2196,11 @@ function stringToHorloge(message)
                 } else if(horloge.length == 8) {
                 }
                 
-                if(GlobalArrayMyPosts.contains(idHorloge) || GlobalArrayMyPosts.contains(idHorloge + '1')) {
+        	query_my_post = '//div[contains(@id,\'' + idHorloge + '\') and contains(@class,\'myPost\')]';
+                var allDivs = evalexp(query_my_post);
+                if (allDivs.snapshotLength != 0 ) {
                         horlogeClass = horlogeClass + ' ' + 'myPost';
-                }
+		}
                 
                 newPart1 = '<span class="' + horlogeClass + '" id="' + idHorloge + '">';
                 newPart2 = '</span>';

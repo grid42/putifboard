@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.02.19
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.07.14
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -22,7 +22,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.02.19';
+const VERSION = '2009.07.14';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const BAS_EN_HAUT = 1;
 const HAUT_EN_BAS = 2;
@@ -737,10 +737,33 @@ function stringToCanard(message)
 }
 
 // Patch de chrisix, inspiré du patch de Triton ci-dessus, inspiré de stringToTotoz ci-dessous
+// Patché par zragg et grid
 function stringToLecon(message)
 {
-    var exp = new RegExp('(le([cç]|&ccedil;|&Ccedil;)on\\s*([0-9]+))', 'gi');
-    return message.replace(exp, '<a href="http://ridercrazy.com/divers/coursfr/lecon$3.html">$1</a>');
+  var index1 = message.indexOf("<a ",0);
+  var exp = new RegExp('([lL]e([cç]|&ccedil;|&Ccedil;)on[ ]*([0-9]+))', 'gi');
+  if ( exp.test(message) )
+  {
+    if (index1 != -1)
+    {
+      var _message = message.substring(0,index1).replace(exp, '<a href="http://ridercrazy.com/divers/coursfr/lecon$3.html">$1</a>');
+      var index2 = message.indexOf("</a>",index1);
+      if (index2 != -1)
+      {
+        _message = _message + message.substring(index1,index2+4);
+        _message = _message + stringToLecon(message.substring(index2+4,message.length));
+        return _message;
+      }
+    }
+    else
+    {
+      return message.replace(exp, '<a href="http://ridercrazy.com/divers/coursfr/lecon$3.html">$1</a>');
+    }
+  }
+  else
+  {
+    return message;
+  }	
 }
 
 function rewriteMessage(message)
@@ -2085,18 +2108,17 @@ function postToSlip(inputField)
                 }
         }
         
-        GM_xmlhttpRequest( {
-                method:'POST',
-                url:postUrl,
+        x = XmlHttpRequest( {
                 headers:{
                         'Content-Type':'application/x-www-form-urlencoded',
                         'Content-Lenght': length,
-                        'User-agent': GM_getValue('dlfp.ua'),
-                        'Cookie': cookies
+                        'User-Agent': GM_getValue('dlfp.ua'),
+                        'Cookie': cookies,
                         },
                 data:formData,
                 onload:function (e){afterPost(e, inputField);}
         });
+	x.open('POST', postUrl, true);
 }
 
 function addTotoz(totoz)

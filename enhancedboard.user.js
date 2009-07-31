@@ -766,10 +766,23 @@ function stringToLecon(message)
   }	
 }
 
+// Corrige le bug DLFP sur les wikiliens
+function stringToWiki(message)
+{
+  var index1 = message.indexOf("[[",0);
+  if (index1 != -1 ) {
+     var exp = new RegExp('\\[\\[(.*)\\]\\]', 'gi');
+     return message.replace(exp, '<a href="http://fr.wikipedia.org/wiki/$1">$1</a>');
+  }  else   {
+    return message;
+  }	
+}
+
 function rewriteMessage(message)
 {
     // On réecrit les leçons, les totoz, les horloges, les urls et les canards
     message = stringToLecon(message);
+    message = stringToWiki(message);
     message = stringToTotoz(message);
     message = stringToHorloge(message);
     message = stringToCanard(message);

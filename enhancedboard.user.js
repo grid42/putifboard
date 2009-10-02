@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.07.31
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.07.33
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -22,13 +22,9 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.07.31';
+const VERSION = '2009.07.33';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
-const BAS_EN_HAUT = 1;
-const HAUT_EN_BAS = 2;
-const DEFAULT_SENS = BAS_EN_HAUT;
 const DEFAULT_UA = DEFAULT_UA_SMALL + '/' + VERSION;
-const DEFAULT_REVERSE = DEFAULT_SENS ;
 const DEFAULT_AUTOREFRESH = true;
 const DEFAULT_TIMEOUT = 30000;
 const DEFAULT_ANTIBOULETMODE = 'nedflan' ;
@@ -79,7 +75,6 @@ var GlobalFirstLoad = 0;
 // Indique qu'on est en cours de saisie ailleurs que dans l'input message.
 var GlobalIsTyping = false;
 // Deux variables d'états. C'est assez Gruik comme approche
-var GlobalReverseInProgress = false;
 var GlobalKeyModeInProgress = false;
 // Contient le cache des totoz
 var GlobalArrayTotoz = new Array();
@@ -147,7 +142,7 @@ const favicon = {
 }
 
 /* Define default settings */
-global_variables = ['totoz','reverse','autorefresh','timeout', 
+global_variables = ['totoz','autorefresh','timeout', 
                  'antibouletmode','favicon','panel_top',
                  'panel_left','chasse','baklogins',
                  'forbiddenwords', 'title', 'totozsrv', 
@@ -177,7 +172,7 @@ global_events = ['load','blur','click','submit','mouseover','mouseout',
                  'keypress', 'change','focus','dblclick','scroll'];
 for(evt in global_events) {
         window.addEventListener(global_events[evt],
-                        function(event) { manageEvent(event); }, true);
+                        function(event) { return manageEvent(event); }, true);
 }
 delete global_events;
 
@@ -465,8 +460,8 @@ function isBoulet(login, message) {
 
 function BoulayTransformator(left, rightDiv) 
 {
-	if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
-        	var sentences = new Array("je suis un gros boulet",
+        if(GM_getValue('dlfp.antibouletmode') == 'nedflan') {
+                var sentences = new Array("je suis un gros boulet",
                                           "je suis lourd",
                                           "je suis chauve",
                                           "je suis un gros abruti",
@@ -476,42 +471,41 @@ function BoulayTransformator(left, rightDiv)
                                           "prout",
                                           "pika",
                                           "plop");
-		var s = sentences[Math.floor(Math.random()*sentences.length)];
+                var s = sentences[Math.floor(Math.random()*sentences.length)];
                 while (rightDiv.innerHTML != (rightDiv.innerHTML = rightDiv.innerHTML.replace(/<[^<>]*>/g, "")));
                         rightDiv.innerHTML = '<i style="color:#aaa" title="MESSAGE:' + rightDiv.innerHTML + '"><b>-</b> '+s+'</i>';
         } else if(GM_getValue('dlfp.antibouletmode') == 'putifuto') {
-		addClass(leftDiv, 'boulet') ;
+                addClass(leftDiv, 'boulet') ;
                 addClass(rightDiv, 'boulet') ;
         }
 }
 
 function UrlTransformator(leftDiv, rightDiv)
 {
-	urls = rightDiv.getElementsByTagName('a');
+        urls = rightDiv.getElementsByTagName('a');
         var regURL = new RegExp('^https?://(www\.)?linuxfr.org');
         for (i=0; i<urls.length;i++) {
-		urls[i].setAttribute('target','_blank');
-        	if(regURL.test(urls[i].getAttribute('href'))) {
-                	if (readCookie('https')=='1') {
-                        	urls[i].protocol="https:";
+                urls[i].setAttribute('target','_blank');
+                if(regURL.test(urls[i].getAttribute('href'))) {
+                        if (readCookie('https')=='1') {
+                                urls[i].protocol="https:";
                         } else {
-                        	urls[i].protocol="http:";
+                                urls[i].protocol="http:";
                         }
                 }
                 if(urls[i].innerHTML.indexOf('[url]')>0) {
-                	var txtURL = "";
+                        var txtURL = "";
                         if(urls[i].getAttribute('href')) {
-                        	for(j=0; j<GlobalsTransforUrls.length;j++) {
-                                	regURL = new RegExp(GlobalsTransforUrls[j][0]);
-                                        if(regURL.test(urls[i].getAttribute('href'))) {
-                                        	txtURL += (txtURL==""?'':'-')+GlobalsTransforUrls[j][1];
+                                for(j=0; j<GlobalsTransforUrls.length;j++) {
+                                        var regURL2 = new RegExp(GlobalsTransforUrls[j][0]);
+                                        if(regURL2.test(urls[i].getAttribute('href'))) {
+                                                txtURL += (txtURL==""?'':'-')+GlobalsTransforUrls[j][1];
                                         }
                                 }
                                         urls[i].innerHTML = (txtURL==""?'<b>[url]</b>':'<b>['+txtURL+']</b>');
                         }
                 }
-	}
-
+        }
 }
 
 // Fonction de réécriture de la ligne.
@@ -545,9 +539,9 @@ function rewriteDivs(leftDiv, rightDiv)
         if (isBoulet(leftDiv.getElementsByTagName('a')[0].textContent,
                                 rightDiv.innerHTML) &&
                         !GM_getValue('dlfp.chasse')) {
-		BoulayTransformator(leftDiv, rightDiv);
+                BoulayTransformator(leftDiv, rightDiv);
         } else {
-		UrlTransformator(leftDiv, rightDiv);
+                UrlTransformator(leftDiv, rightDiv);
                 var exp_login = new RegExp('(' + readCookie('login') + '&lt;)', 'g');
                 var exp_moules = new RegExp('(moules&lt;)', 'g');
                 if(exp_login.test(rightDiv.innerHTML) ||
@@ -583,9 +577,6 @@ function initRefresh()
 }
 function reversePosts()
 {
-        if(!GlobalReverseInProgress) {
-                GlobalReverseInProgress = true;
-                document.getElementById('sens').style.color = 'gray';
                 var allDiv = evalexp('//div[@class=\'boardindex\']/div[starts-with(@class, \'boardleftmsg\') or starts-with(@class, \'boardrightmsg\') or starts-with(@style,\'clear\')]');
                 lastDiv = allDiv.snapshotItem(allDiv.snapshotLength - 1);
                 firstDiv = allDiv.snapshotItem(0);
@@ -604,32 +595,8 @@ function reversePosts()
                 br = evalexp('//div[@class=\'boardindex\']/br[position()=1]').snapshotItem(0);
                 panel = document.getElementById('panel');
                 
-                if(sens == HAUT_EN_BAS) {
-                        // On place le form juste après le div du panel 
-                        // pour qu'ils soient alignés
-                        GlobalBoardIndex.appendChild(form);
-                        window.location = '#bottom';
-                        
-                } else {
-                        GlobalBoardIndex.insertBefore(form, br);
-                        window.location = '#top';
-                }
-                GlobalReverseInProgress = false;
-                document.getElementById('sens').style.color = 'black';
-        }
-}
-
-function reverseTribune()
-{
-        // On modifie la variable globale
-        if(GlobalReverseInProgress) {
-                return null;
-        }
-        sens = GM_getValue('dlfp.reverse');
-        sens = (sens == HAUT_EN_BAS ? BAS_EN_HAUT : HAUT_EN_BAS);
-        GM_setValue('dlfp.reverse', sens);
-        reversePosts();
-        rewriteInput();
+                GlobalBoardIndex.appendChild(form);
+                window.location = '#bottom';
 }
 
 function addTransforUrl()
@@ -675,7 +642,7 @@ function manageEvent(event)
                         onSubmit(target);
                         event.stopPropagation();
                         event.preventDefault();
-                        break;
+                        return false;
                 case 'mouseover':
                         onMouseOver(event);
                         break;
@@ -763,7 +730,7 @@ function stringToLecon(message)
   else
   {
     return message;
-  }	
+  }        
 }
 
 // Corrige le bug DLFP sur les wikiliens
@@ -775,7 +742,7 @@ function stringToWiki(message)
      return message.replace(exp, '<a href="http://fr.wikipedia.org/wiki/$1">$1</a>');
   }  else   {
     return message;
-  }	
+  }        
 }
 
 function rewriteMessage(message)
@@ -806,18 +773,10 @@ function rewriteHorloges()
         // On récupère les couples de div et on les réecrit
         var allLeftDivs = evalexp('//div[starts-with(@class,\'boardleftmsg\')]');
         var allRightDivs = evalexp('//div[starts-with(@class,\'boardrightmsg\')]');
-        
-        if(GM_getValue('dlfp.reverse') == HAUT_EN_BAS) {
                 for (var i = 0; i < allLeftDivs.snapshotLength; i++) {
                         rewriteDivs(allLeftDivs.snapshotItem(i),
                                         allRightDivs.snapshotItem(i));
                 }
-        } else         {
-                for (var i = allLeftDivs.snapshotLength - 1; i >= 0; i--) {
-                        rewriteDivs(allLeftDivs.snapshotItem(i),
-                                        allRightDivs.snapshotItem(i));
-                }
-        }
 }
 
 function addBottomLink()
@@ -1013,7 +972,7 @@ function displayPanel()
                                 'http://pycoincoin.free.fr/onlinecc/img/config.png',
                                 'Configuration'));
         expandLink.appendChild(addToolbarIcon('uUpdate',
-				'http://pycoincoin.free.fr/onlinecc/img/parse.png',
+                                'http://pycoincoin.free.fr/onlinecc/img/parse.png',
                                 'A moi les fritures'));
         hiddenPanel = document.createElement('div');
         hiddenPanel.setAttribute('id','configZone');
@@ -1034,7 +993,6 @@ function displayPanel()
         panelOnglet1.setAttribute('class','subpanel');
         panelOnglet1.setAttribute('id','configPanel');
         
-        panelOnglet1.appendChild(addToolbarButton('sens','Retourner la tribune'));
         
         panelOnglet1.appendChild(addToolbarCheckBox('uautorefresh',
                                 'Auto Refresh', 
@@ -1262,6 +1220,7 @@ function onSubmit(target)
 
 function onLoad()
 {
+        GM_log("LOADING");
         GlobalFirstLoad = 1; 
         // On désactive les trucs originels
         jsIsEnabled = readCookie('jssuxor');
@@ -1276,10 +1235,7 @@ function onLoad()
         displayPanel();
         onLoadGetMessages();
         addBottomLink();
-        sens = GM_getValue('dlfp.reverse'); 
-        if(sens != DEFAULT_SENS) {
-                reversePosts();
-        }
+        reversePosts();
         rewriteInput();
         // rewriteTotoz();
         rewriteHorloges();
@@ -1311,13 +1267,8 @@ function rewriteInput()
 
         if (GM_getValue('dlfp.inputfixed')==true) {
                 element.style.position='fixed';
-                if (GM_getValue('dlfp.reverse')==HAUT_EN_BAS) {
                         element.style.bottom='0.2em' //='96.5%';
                         document.getElementById('panel').style.top='2em';
-                } else {
-                        element.style.top='2.2em';
-                        document.getElementById('panel').style.top='5.5em';
-                }
                 element.style.left='41px';
                 element.parentNode.style.z_index='0';
                 element.parentNode.style.padding='0px';
@@ -1332,15 +1283,9 @@ function rewriteInput()
                 dv.style.position='fixed';
                 dv.style.width='100%';
                 dv.style.left='0';
-                if (GM_getValue('dlfp.reverse')==HAUT_EN_BAS) {
-//                        dv.style.height='2em';
                         dv.style.top='auto';
                         dv.style.bottom='0';
                         dv.style.height='1.6em';
-                } else {
-                        dv.style.height='2em';
-                        dv.style.top='1.8em';
-                }
                 p.parentNode.insertBefore(dv,p);
 
         } else {
@@ -1491,12 +1436,7 @@ function onKeyPress(event)
                                         queryLeft = '//div[starts-with(@class,\'boardleftmsg\')]';
                                         allLeftDiv = evalexp(queryLeft);
 
-                                        sens = GM_getValue('dlfp.reverse'); 
-                                        if (sens != HAUT_EN_BAS) {
                                                 leftDiv = allLeftDiv.snapshotItem(0);
-                                        } else {
-                                                leftDiv = allLeftDiv.snapshotItem(allLeftDiv.snapshotLength-1);
-                                        }
                                 }
                                 if(leftDiv != null) {
                                         leftDiv.focus();
@@ -1520,7 +1460,7 @@ function onKeyPress(event)
 
                         var allLeftDiv = evalexp(queryLeft);
                         for (var i = 0; i < allLeftDiv.snapshotLength; i++) {
-                        	appendTextToMessage(allLeftDiv.snapshotItem(i).getElementsByTagName('b')[0].innerHTML);
+                                appendTextToMessage(allLeftDiv.snapshotItem(i).getElementsByTagName('b')[0].innerHTML);
                                 appendTextToMessage(' ');
                         }
                         event.stopPropagation();
@@ -1533,10 +1473,10 @@ function onKeyPress(event)
 
                         var allLeftDiv = evalexp(queryLeft);
                         for (var i = 0; i < allLeftDiv.snapshotLength; i++) {
-				collec = allLeftDiv.snapshotItem(i).getElementsByTagName('a');
-				for(var j in collec) {
-					window.open(collec[j]);
-				}
+                                collec = allLeftDiv.snapshotItem(i).getElementsByTagName('a');
+                                for(var j in collec) {
+                                        window.open(collec[j]);
+                                }
                         }
                 } else {
                         GM_log(event.keyCode);
@@ -1696,9 +1636,7 @@ function onClick(event)
 
         switch(nodeId) {
                 case 'refresh':
-                        if(!GlobalReverseInProgress) {
-                                refreshSlip();
-                        }
+                        refreshSlip();
                         return true;
                 case 'uUpdate':
                         window.location = 'http://pqcc.free.fr/news/share/minifilemanager/enhancedboard.user.js';
@@ -1715,11 +1653,6 @@ function onClick(event)
                         event.stopPropagation();
                         event.preventDefault();
                         return true;
-                case 'sens':
-                        if(!GlobalReverseInProgress) {
-                                reverseTribune();
-                        }
-                        return true;
                 case 'uAddTransforUrl':
                         addTransforUrl();
                         return true;
@@ -1734,15 +1667,10 @@ function onClick(event)
                                 queryLeft = '//div[starts-with(@class,\'boardleftmsg\') and contains(@class,\'highlighted\')]';
                                 var allLeftDiv = evalexp(queryLeft);
                                 for (var i = 0; i < allLeftDiv.snapshotLength; i++) {
-                                        sens = GM_getValue('dlfp.reverse');
                                         leftDiv= allLeftDiv.snapshotItem(0);
                                         event.preventDefault();
                                         event.stopPropagation();
-                                        if(sens == HAUT_EN_BAS) {
                                                 document.documentElement.scrollTop=leftDiv.offsetTop-30;
-                                        } else {
-                                                document.documentElement.scrollTop=leftDiv.offsetTop+30;
-                                        }
                                         if(GlobalClickId != leftDiv.id) {
                                                 GlobalPopup.style.display='none';
                                                 GlobalPopup.innerHTML='';
@@ -1781,6 +1709,7 @@ function onClick(event)
                                 element.value = str;
                                 GlobalIsFortuning = GlobalIsFortuned = false;
                                 postToSlip(element);
+                                return false;
                         }
                         break;
                 case 'button':
@@ -1850,15 +1779,9 @@ function highlightPointedHorloge(id)
                 
                 yScreen = document.documentElement.scrollTop;
                 showPopup = false;
-                if(GM_getValue('dlfp.reverse') == HAUT_EN_BAS) {
                         if(yPost < yScreen) {
                                 showPopup = true;                                        
                         }
-                } else {
-                        if(yPost > yScreen + window.innerHeight) {
-                                showPopup = true;
-                        }
-                }
                 if(showPopup) {
                         leftClone = leftDiv.cloneNode(true);
                         rightClone = rightDiv.cloneNode(true);
@@ -1873,11 +1796,7 @@ function highlightPointedHorloge(id)
                         GlobalPopup.appendChild(leftClone);
                         GlobalPopup.appendChild(rightClone);
                         GlobalPopup.appendChild(spacerClone);
-                        if(GM_getValue('dlfp.reverse') == HAUT_EN_BAS) {
                                 GlobalPopup.style.top = (60 + yScreen) + 'px';
-                        } else {
-                                GlobalPopup.style.top = (yScreen + window.innerHeight - 60 ) + 'px'; 
-                        }
                         GlobalPopup.style.display = '';
                         showPopup = false;
                 }
@@ -1904,15 +1823,9 @@ function unhighlightPointedHorloge(id)
 
                 
                 hidePopup = false;
-                if(GM_getValue('dlfp.reverse') == HAUT_EN_BAS) {
                         if(yPost < yScreen) {
                                 hidePopup = true;                                        
                         }
-                } else {
-                        if(yPost > yScreen + window.innerHeight) {
-                                hidePopup = true;
-                        }
-                }
                 if(hidePopup) {
                         GlobalPopup.style.display = 'none';
                         GlobalPopup.innerHTML = '';
@@ -1960,11 +1873,9 @@ function unhighlightLeftHorloge(id)
 /* slip GET & POST functions */
 function refreshSlip()
 {
-        if(!GlobalReverseInProgress) {
                 window.clearInterval(GlobalRefreshTimerId);
                 GlobalTimer.style.display='';
 
-                document.getElementById('sens').style.color = 'gray';
                 document.getElementById('refresh').style.color = 'gray';
                 GM_xmlhttpRequest( {
                         method: 'GET',
@@ -1979,9 +1890,6 @@ function refreshSlip()
                         onerror: function (e){slipError(e);},
                         onload: function (e){slipLoaded(e);}
                 });
-        } else {
-                _log('refreshSlipdoublons');
-        }
 }
 
 function slipProgress(event){};
@@ -1992,7 +1900,6 @@ function slipError(event){
 function slipLoaded(details)
 {
         data = details.responseText;
-        sens = GM_getValue('dlfp.reverse');
         if(details.status == 200) {
                 // parse
                 var parser = new DOMParser();
@@ -2059,31 +1966,20 @@ function slipLoaded(details)
                                 allLeftDivs = evalexp('//div[@class=\'boardindex\']/div[starts-with(@class,\'boardleftmsg\')]');
                                 lastLeftDiv = allLeftDivs.snapshotItem(allLeftDivs.snapshotLength - 1);
                                         
-                                if(GM_getValue('dlfp.reverse') == BAS_EN_HAUT) {
-                                        GlobalBoardIndex.insertBefore(spacerDiv, firstDiv);
-                                } else {
                                         GlobalBoardIndex.insertBefore(spacerDiv, lastDiv.nextSibling);
-                                }
                                         
                                 GlobalBoardIndex.insertBefore(rightDiv, spacerDiv);
                                 GlobalBoardIndex.insertBefore(leftDiv, rightDiv);
                                         
-                                if(GM_getValue('dlfp.reverse') == BAS_EN_HAUT) {
-                                        GlobalBoardIndex.removeChild(lastLeftDiv);
-                                        GlobalBoardIndex.removeChild(lastDiv.previousSibling);
-                                        GlobalBoardIndex.removeChild(lastDiv);
-                                } else {
                                         GlobalBoardIndex.removeChild(firstDiv.nextSibling.nextSibling);
                                         GlobalBoardIndex.removeChild(firstDiv.nextSibling);
                                         GlobalBoardIndex.removeChild(firstDiv);
-                                }
                                 GlobalLastId = currentId;
                         }
                 }
         } else {
                 _log('http=' + details.status);
         }
-        document.getElementById('sens').style.color = 'black';
         document.getElementById('refresh').style.color = 'black';
         GlobalTimer.style.display='none';
         initRefresh();
@@ -2100,38 +1996,35 @@ function postToSlip(inputField)
         var length = formData.length;
         var cookies = 'unique_id=' + readCookie('unique_id') + ';md5=' + readCookie('md5') + ';';
         
-        function afterPost(e, inputField) {
-                refreshSlip();
-                s='Vous devez être identifié et avoir un karma supérieur à 2 pour poster sur la tribune.';
-                ind=e.responseText.indexOf(s);
-                empty=1;
-                if(ind !=-1 && ind < 3500) {
-                        alert(s);
-                        empty=0;
-                }
-                s='Désolé, mais vous ne pouvez pas saisir un nouveau message, revenez plus tard.';
-                ind=e.responseText.indexOf(s);
-                if(ind !=-1 && ind < 3500) {
-                        alert(s);
-                        empty=0;
-                }
-                if(e.status == 200) {
+        var x = new XMLHttpRequest();
+        function afterPost(e) {
+                if (x.readyState == 4) {
+                        refreshSlip();
+                        s='Vous devez être identifié et avoir un karma supérieur à 2 pour poster sur la tribune.';
+                        ind=x.responseText.indexOf(s);
+                        empty=1;
+                        if(ind !=-1 && ind < 3500) {
+                                alert(s);
+                                empty=0;
+                        }
+                        s='Désolé, mais vous ne pouvez pas saisir un nouveau message, revenez plus tard.';
+                        ind=x.responseText.indexOf(s);
+                        if(ind !=-1 && ind < 3500) {
+                                alert(s);
+                                empty=0;
+                        }
                         if(empty==1) inputField.value = '';
+                        GM_log(inputField.value);
                         removeClass(inputField,'onsubmit');
                 }
         }
         
-        x = XmlHttpRequest( {
-                headers:{
-                        'Content-Type':'application/x-www-form-urlencoded',
-                        'Content-Lenght': length,
-                        'User-Agent': GM_getValue('dlfp.ua'),
-                        'Cookie': cookies,
-                        },
-                data:formData,
-                onload:function (e){afterPost(e, inputField);}
-        });
-	x.open('POST', postUrl, true);
+        x.onreadystatechange = function (e) {afterPost(e);}
+        x.open('POST', postUrl, true);
+        x.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+        x.setRequestHeader('Content-Lenght', length);
+        x.setRequestHeader('User-Agent', GM_getValue('dlfp.ua'));
+        x.send(formData);
 }
 
 function addTotoz(totoz)
@@ -2159,9 +2052,7 @@ function showTotoz(totoz, x, y)
         element.style.visibility = 'hidden';
         element.style.display = '';
         var final_y = y + 10 + element.clientHeight;
-        if(final_y > window.innerHeight && GM_getValue('dlfp.reverse') == HAUT_EN_BAS) {
                 element.style.top = y + document.documentElement.scrollTop - 10 - element.clientHeight + 'px';
-        }
         element.style.visibility = '';
 }
 
@@ -2174,7 +2065,7 @@ function stringToTotoz(message)
         } else {
             return message.replace(exp, '<img src="' + GM_getValue('dlfp.totozsrv') + '$1.gif" />');
         }
-}
+}        
 
 function stringToHorloge(message)
 {
@@ -2190,7 +2081,7 @@ function stringToHorloge(message)
         horloges = new Array();
         horlogesIndexes = new Array();
         
-        while(result && result.length > 0) {
+        while(result &&         result.length > 0) {
                 horloge = result[0];
                 horlogeExp = horloge.replace(/\^/,'\\^');
                 
@@ -2225,17 +2116,17 @@ function stringToHorloge(message)
                         exposant = horloge.charAt(horloge.length - 1);
                         if(exposant == '¹') nb = 1;
                         else if(exposant == '²') nb = 2;
-                        else if(exposant == '³') nb = 3;
+                                else if(exposant == '³') nb = 3;
                         idHorloge = horloge.substr(0,8) + nb;
                 } else if(horloge.length == 5) { // ex: 10:45
                 } else if(horloge.length == 8) {
                 }
                 
-        	query_my_post = '//div[contains(@id,\'' + idHorloge + '\') and contains(@class,\'myPost\')]';
+                query_my_post = '//div[contains(@id,\'' + idHorloge + '\') and contains(@class,\'myPost\')]';
                 var allDivs = evalexp(query_my_post);
                 if (allDivs.snapshotLength != 0 ) {
                         horlogeClass = horlogeClass + ' ' + 'myPost';
-		}
+                }
                 
                 newPart1 = '<span class="' + horlogeClass + '" id="' + idHorloge + '">';
                 newPart2 = '</span>';
@@ -2264,7 +2155,7 @@ function postAlert()
 {
         if (GM_getValue('dlfp.clignotement')!='Inactif') {
                 if (!GlobalWindowFocus) {
-                        GlobalAlertState++;
+                                GlobalAlertState++;
                         var temp = '* '+GM_getValue('dlfp.title');
                         if (document.title == GM_getValue('dlfp.title')) {
                                 temp = '* '+GM_getValue('dlfp.title');

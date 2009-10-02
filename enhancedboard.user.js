@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.07.33
+// @description    Bring Web 2.0 features to LinuxFr - Version 2009.07.34
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -22,7 +22,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.07.33';
+const VERSION = '2009.07.34';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const DEFAULT_UA = DEFAULT_UA_SMALL + '/' + VERSION;
 const DEFAULT_AUTOREFRESH = true;
@@ -1489,22 +1489,6 @@ function onKeyDown(event)
         if(event.target.id == 'message') {
                 if(event.altKey) {
                         switch(event.keyCode) {
-                                case 79:
-                                        appendTextToMessage('_o/* <b>BLAM</b>! ');
-                                        break;
-                                case 77:
-                                        appendTextToMessage('====> <b>Moment ' + getSelectedText() +'</b> <====', 16);
-                                        break;
-                                case 70:
-                                        appendTextToMessage('#fortune ');
-                                        GlobalIsFortuning = true;
-                                        break;
-                                case 66:
-                                        appendTextToMessage('<b>' + getSelectedText()+'</b>', 3);
-                                        break;
-                                case 73:
-                                        appendTextToMessage('<i>' + getSelectedText()+'</i>', 3);
-                                        break;
                                 case 85:
                                         appendTextToMessage('<u>' + getSelectedText()+'</u>', 3);
                                         break;
@@ -1514,25 +1498,42 @@ function onKeyDown(event)
                                 case 80:
                                         appendTextToMessage('_o/* <b>paf!</b> ');
                                         break;
+                                case 79:
+                                        appendTextToMessage('_o/* <b>BLAM</b>! ');
+                                        break;
+                                case 77:
+                                        appendTextToMessage('====> <b>Moment ' + getSelectedText() +'</b> <====', 16);
+                                        break;
+                                case 73:
+                                        appendTextToMessage('<i>' + getSelectedText()+'</i>', 3);
+                                        break;
+                                case 70:
+                                        appendTextToMessage('#fortune ');
+                                        GlobalIsFortuning = true;
+                                        break;
                                 case 67:
                                         appendTextToMessage('\\o/ chauvounet \\o/');
                                         break;
+                                case 66:
+                                        appendTextToMessage('<b>' + getSelectedText()+'</b>', 3);
+                                        break;
                         }
                         switch(event.keyCode) {
-                                case 79:
-                                case 77:
-                                case 70:
-                                case 66:
-                                case 73:
                                 case 85:
                                 case 83:
                                 case 80:
+                                case 79:
+                                case 77:
+                                case 73:
+                                case 70:
                                 case 67:
+                                case 66:
                                         event.stopPropagation();
                                         event.preventDefault();
                         }
                 }
-        } else if(!event.ctrlKey && !event.metaKey && ! event.altKey && (event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) {
+        } else if(!event.ctrlKey && !event.metaKey &&
+                  !event.altKey && (event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) {
                 /* autofocus */
                 if(GlobalIsTyping == false)
                         document.getElementById('message').focus();  
@@ -1548,7 +1549,6 @@ function onChange(event)
         } else if(event.target.id == 'timeoutinput') {
                 if(!isNaN(event.target.value)) {
                         GM_setValue('dlfp.timeout',event.target.value * 1000)
-                        // initRefresh();
                         window.location.reload();
                 } else {
                         event.target.value = GM_getValue('dlfp.timeout');
@@ -1597,9 +1597,11 @@ function onChange(event)
         } else if(event.target.id == 'newRegexURL') {
                 // non traitée
         } else if(event.target.id == 'newURL') {
+                // non traitée
         } else if(event.target.id == 'uTransforUrls') {
+                // non traitée
         } else {
-                        alert("ERROR " + event.target.id);
+               alert("ERROR " + event.target.id);
         }
         GlobalIsTyping = false;
 }
@@ -1639,7 +1641,7 @@ function onClick(event)
                         refreshSlip();
                         return true;
                 case 'uUpdate':
-                        window.location = 'http://pqcc.free.fr/news/share/minifilemanager/enhancedboard.user.js';
+                        window.location = HOME_URL + 'share/minifilemanager/enhancedboard.user.js';
                         event.stopPropagation();
                         return true;
                 case 'configZoneLink':
@@ -1892,11 +1894,16 @@ function refreshSlip()
                 });
 }
 
-function slipProgress(event){};
-function slipError(event){
+function slipProgress(event)
+{
+};
+
+function slipError(event)
+{
         GlobalTimer.style.display='none';
         initRefresh();
 };
+
 function slipLoaded(details)
 {
         data = details.responseText;
@@ -2081,7 +2088,7 @@ function stringToHorloge(message)
         horloges = new Array();
         horlogesIndexes = new Array();
         
-        while(result &&         result.length > 0) {
+        while(result && result.length > 0) {
                 horloge = result[0];
                 horlogeExp = horloge.replace(/\^/,'\\^');
                 
@@ -2155,7 +2162,7 @@ function postAlert()
 {
         if (GM_getValue('dlfp.clignotement')!='Inactif') {
                 if (!GlobalWindowFocus) {
-                                GlobalAlertState++;
+                        GlobalAlertState++;
                         var temp = '* '+GM_getValue('dlfp.title');
                         if (document.title == GM_getValue('dlfp.title')) {
                                 temp = '* '+GM_getValue('dlfp.title');
@@ -2195,21 +2202,15 @@ function getSelectedText(){
         return base.value.substring(base.selectionStart, base.selectionEnd);
 }
 
+/* ---------------------------- SERIALIZE TOOLKIT --------------------- */
+/* discuss at: http://phpjs.org/functions/serialize 			*/
+/* version: 812.3015
+ * 	original by: Arpad Ray (mailto:arpad@php.net)
+ * 	improved by: Dino
+ * 	bugfixed by: Andrej Pavlovic
+ * 	bugfixed by: Garagoth
+ */
 function serialize( mixed_value ) {
-    // Returns a string representation of variable (which can later be unserialized)  
-    // 
-    // version: 812.3015
-    // discuss at: http://phpjs.org/functions/serialize
-    // +   original by: Arpad Ray (mailto:arpad@php.net)
-    // +   improved by: Dino
-    // +   bugfixed by: Andrej Pavlovic
-    // +   bugfixed by: Garagoth
-    // %          note: We feel the main purpose of this function should be to ease the transport of data between php & js
-    // %          note: Aiming for PHP-compatibility, we have to translate objects to arrays
-    // *     example 1: serialize(['Kevin', 'van', 'Zonneveld']);
-    // *     returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
-    // *     example 2: serialize({firstName: 'Kevin', midName: 'van', surName: 'Zonneveld'});
-    // *     returns 2: 'a:3:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";s:7:"surName";s:9:"Zonneveld";}'
     var _getType = function( inp ) {
         var type = typeof inp, match;
         var key;
@@ -2240,7 +2241,7 @@ function serialize( mixed_value ) {
     switch (type) {
         case "function": 
             val = ""; 
-            break;
+            break;    // +   
         case "undefined":
             val = "N";
             break;
@@ -2278,22 +2279,6 @@ function serialize( mixed_value ) {
     return val;
 }
 function unserialize(data){
-    // Takes a string representation of variable and recreates it  
-    // 
-    // version: 810.114
-    // discuss at: http://phpjs.org/functions/unserialize
-    // +     original by: Arpad Ray (mailto:arpad@php.net)
-    // +     improved by: Pedro Tainha (http://www.pedrotainha.com)
-    // +     bugfixed by: dptr1988
-    // +      revised by: d3x
-    // +     improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // %            note: We feel the main purpose of this function should be to ease the transport of data between php & js
-    // %            note: Aiming for PHP-compatibility, we have to translate objects to arrays 
-    // *       example 1: unserialize('a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}');
-    // *       returns 1: ['Kevin', 'van', 'Zonneveld']
-    // *       example 2: unserialize('a:3:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";s:7:"surName";s:9:"Zonneveld";}');
-    // *       returns 2: {firstName: 'Kevin', midName: 'van', surName: 'Zonneveld'}
-    
     var error = function (type, msg, filename, line){throw new window[type](msg, filename, line);};
     var read_until = function (data, offset, stopchr){
         var buf = [];

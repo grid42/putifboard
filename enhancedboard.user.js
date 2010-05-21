@@ -22,6 +22,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
+const BRANCH = 'dev'
 const VERSION = '2010.05.02';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const DEFAULT_UA = DEFAULT_UA_SMALL + '/' + VERSION;
@@ -42,6 +43,7 @@ const DEFAULT_MYALERT = false;
 const DEFAULT_INPUTFIXED = true;
 const DEFAULT_MP3 = false;
 const HOME_URL = 'http://pqcc.free.fr/news/';
+const HOME_SCRIPT = 'http://github.com/grid42/putifboard/raw/' + BRANCH + '/enhancedboard.user.js';
 const PANEL_WIDTH = 20;
 const DEFAULT_GLOBALSTRANSFORURLS = [
   ['\w*(jpg)$','IMG'],
@@ -1048,7 +1050,8 @@ function displayPanel()
         panelOnglet1.innerHTML += '<tr class="subpanel">'+
                 '<td style="text-align:right;color:gray;top:3px;" '+
                 'class="subpanel" colspan="2">'+
-                'Current version : <a href="' + HOME_URL + '">' + VERSION + '</a></td></tr>';
+                'Current version : <a href="' + HOME_SCRIPT + '">' + 
+                BRANCH + ' ' + VERSION + '</a></td></tr>';
         onglet1.appendChild(panelOnglet1);
         ContentItems.appendChild(onglet1);
         

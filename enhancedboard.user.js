@@ -477,6 +477,8 @@ function BoulayTransformator(left, rightDiv)
         } else if(GM_getValue('dlfp.antibouletmode') == 'putifuto') {
                 addClass(leftDiv, 'boulet') ;
                 addClass(rightDiv, 'boulet') ;
+        } else if(GM_getValue('dlfp.antibouletmode') == 'chrisix') {
+                rightDiv.style.color = "#aaa"; 
         }
 }
 
@@ -730,7 +732,7 @@ function stringToLecon(message)
   else
   {
     return message;
-  }        
+  }
 }
 
 // Corrige le bug DLFP sur les wikiliens
@@ -742,7 +744,7 @@ function stringToWiki(message)
      return message.replace(exp, '<a href="http://fr.wikipedia.org/wiki/$1">$1</a>');
   }  else   {
     return message;
-  }        
+  }
 }
 
 function rewriteMessage(message)
@@ -773,10 +775,10 @@ function rewriteHorloges()
         // On récupère les couples de div et on les réecrit
         var allLeftDivs = evalexp('//div[starts-with(@class,\'boardleftmsg\')]');
         var allRightDivs = evalexp('//div[starts-with(@class,\'boardrightmsg\')]');
-                for (var i = 0; i < allLeftDivs.snapshotLength; i++) {
-                        rewriteDivs(allLeftDivs.snapshotItem(i),
-                                        allRightDivs.snapshotItem(i));
-                }
+        for (var i = 0; i < allLeftDivs.snapshotLength; i++) {
+                rewriteDivs(allLeftDivs.snapshotItem(i),
+                            allRightDivs.snapshotItem(i));
+        }
 }
 
 function addBottomLink()
@@ -1020,7 +1022,7 @@ function displayPanel()
                                 GM_getValue('dlfp.chasse')));
         panelOnglet1.appendChild(addToolbarSelectBox('ubouletmode',
                                 'Mode de filtrage', 
-                                ['putifuto','nedflan'], 
+                                ['putifuto','nedflan','chrisix'], 
                                 GM_getValue('dlfp.antibouletmode'),50));
         panelOnglet1.appendChild(addToolbarSelectBox('utotozmode',
                                 'Totoz', 
@@ -1220,7 +1222,6 @@ function onSubmit(target)
 
 function onLoad()
 {
-        GM_log("LOADING");
         GlobalFirstLoad = 1; 
         // On désactive les trucs originels
         jsIsEnabled = readCookie('jssuxor');
@@ -1436,7 +1437,7 @@ function onKeyPress(event)
                                         queryLeft = '//div[starts-with(@class,\'boardleftmsg\')]';
                                         allLeftDiv = evalexp(queryLeft);
 
-                                                leftDiv = allLeftDiv.snapshotItem(0);
+                                        leftDiv = allLeftDiv.snapshotItem(0);
                                 }
                                 if(leftDiv != null) {
                                         leftDiv.focus();
@@ -1504,36 +1505,45 @@ function onKeyDown(event)
                                 case 77:
                                         appendTextToMessage('====> <b>Moment ' + getSelectedText() +'</b> <====', 16);
                                         break;
-                                case 73:
-                                        appendTextToMessage('<i>' + getSelectedText()+'</i>', 3);
-                                        break;
                                 case 70:
                                         appendTextToMessage('#fortune ');
                                         GlobalIsFortuning = true;
                                         break;
-                                case 67:
-                                        appendTextToMessage('\\o/ chauvounet \\o/');
-                                        break;
                                 case 66:
                                         appendTextToMessage('<b>' + getSelectedText()+'</b>', 3);
                                         break;
+                                case 73:
+                                        appendTextToMessage('<i>' + getSelectedText()+'</i>', 3);
+                                        break;
+                                case 85:
+                                        appendTextToMessage('<u>' + getSelectedText()+'</u>', 3);
+                                        break;
+                                case 83:
+                                        appendTextToMessage('<s>' + getSelectedText()+'</s>', 3);
+                                        break;
+                                case 80:
+                                        appendTextToMessage('_o/* <b>paf!</b> ');
+                                        break;
+                                case 67:
+                                        appendTextToMessage('\\o/ chauvounet \\o/');
+                                        break;
                         }
                         switch(event.keyCode) {
+                                case 79:
+                                case 77:
+                                case 70:
+                                case 66:
+                                case 73:
                                 case 85:
                                 case 83:
                                 case 80:
-                                case 79:
-                                case 77:
-                                case 73:
-                                case 70:
                                 case 67:
                                 case 66:
                                         event.stopPropagation();
                                         event.preventDefault();
                         }
                 }
-        } else if(!event.ctrlKey && !event.metaKey &&
-                  !event.altKey && (event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) {
+        } else if(!event.ctrlKey && !event.metaKey && ! event.altKey && (event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) {
                 /* autofocus */
                 if(GlobalIsTyping == false)
                         document.getElementById('message').focus();  
@@ -1697,7 +1707,7 @@ function onClick(event)
                                         }
                                 }
                                 horlogeToInsert = horlogeToInsert + exposant;
-                                appendTextToMessage(horlogeToInsert + ' pan ! pan ! ');
+                                appendTextToMessage(horlogeToInsert + ' pan ! pan !');
                           }
                         }
                         break;
@@ -2002,7 +2012,7 @@ function postToSlip(inputField)
 
         var length = formData.length;
         var cookies = 'unique_id=' + readCookie('unique_id') + ';md5=' + readCookie('md5') + ';';
-        
+         
         var x = new XMLHttpRequest();
         function afterPost(e) {
                 if (x.readyState == 4) {
@@ -2072,7 +2082,7 @@ function stringToTotoz(message)
         } else {
             return message.replace(exp, '<img src="' + GM_getValue('dlfp.totozsrv') + '$1.gif" />');
         }
-}        
+}
 
 function stringToHorloge(message)
 {
@@ -2123,7 +2133,7 @@ function stringToHorloge(message)
                         exposant = horloge.charAt(horloge.length - 1);
                         if(exposant == '¹') nb = 1;
                         else if(exposant == '²') nb = 2;
-                                else if(exposant == '³') nb = 3;
+                        else if(exposant == '³') nb = 3;
                         idHorloge = horloge.substr(0,8) + nb;
                 } else if(horloge.length == 5) { // ex: 10:45
                 } else if(horloge.length == 8) {
@@ -2203,12 +2213,12 @@ function getSelectedText(){
 }
 
 /* ---------------------------- SERIALIZE TOOLKIT --------------------- */
-/* discuss at: http://phpjs.org/functions/serialize 			*/
+/* discuss at: http://phpjs.org/functions/serialize                         */
 /* version: 812.3015
- * 	original by: Arpad Ray (mailto:arpad@php.net)
- * 	improved by: Dino
- * 	bugfixed by: Andrej Pavlovic
- * 	bugfixed by: Garagoth
+ *         original by: Arpad Ray (mailto:arpad@php.net)
+ *         improved by: Dino
+ *         bugfixed by: Andrej Pavlovic
+ *         bugfixed by: Garagoth
  */
 function serialize( mixed_value ) {
     var _getType = function( inp ) {
@@ -2241,7 +2251,7 @@ function serialize( mixed_value ) {
     switch (type) {
         case "function": 
             val = ""; 
-            break;    // +   
+            break;
         case "undefined":
             val = "N";
             break;

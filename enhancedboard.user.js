@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
-// @description    Bring Web 2.0 features to LinuxFr - Version 2009.07.34
+// @description    Bring Web 2.0 features to LinuxFr - Version 2010.05.01
 // @include        http://linuxfr.org/board
 // @include        http://linuxfr.org/board/*
 // @include        http://www.linuxfr.org/board
@@ -22,7 +22,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2009.07.34';
+const VERSION = '2010.05.01';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const DEFAULT_UA = DEFAULT_UA_SMALL + '/' + VERSION;
 const DEFAULT_AUTOREFRESH = true;
@@ -713,7 +713,7 @@ function stringToLecon(message)
   {
     if (index1 != -1)
     {
-      var _message = message.substring(0,index1).replace(exp, '<a href="http://ridercrazy.com/divers/coursfr/lecon$3.html">$1</a>');
+      var _message = message.substring(0,index1).replace(exp, '<a href="http://lecons.ssz.fr/lecon/$3/">$1</a>');
       var index2 = message.indexOf("</a>",index1);
       if (index2 != -1)
       {
@@ -724,7 +724,7 @@ function stringToLecon(message)
     }
     else
     {
-      return message.replace(exp, '<a href="http://ridercrazy.com/divers/coursfr/lecon$3.html">$1</a>');
+      return message.replace(exp, '<a href="http://lecons.ssz.fr/lecon/$3/">$1</a>');
     }
   }
   else

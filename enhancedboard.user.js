@@ -1,6 +1,6 @@
 // ==UserScript==
 // -*- mode: c; c-basic-offset: 8; -*-
-//  * vim: noexpandtab sw=8 ts=8 sts=0:
+//  * vim: expandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
 // @description    Bring Web 2.0 features to LinuxFr - Version 1609.15.16
@@ -22,6 +22,7 @@
 GM_setValue('dlfp.debug',0);
 
 //--- Section "DEFINE CONST" ---
+const BRANCH = 'chauve';
 const VERSION = '1609.15.16';
 const DEFAULT_UA_SMALL = 'EnhancedBoard';
 const BAS_EN_HAUT = 1;
@@ -1089,7 +1090,8 @@ function displayPanel()
         panelOnglet1.innerHTML += '<tr class="subpanel">'+
                 '<td style="text-align:right;color:gray;top:3px;" '+
                 'class="subpanel" colspan="2">'+
-                'Current version : <a href="' + HOME_URL + '">' + VERSION + '</a></td></tr>';
+                'Current version : <a href="' + HOME_SCRIPT + '">' + 
+                BRANCH + ' ' + VERSION + '</a></td></tr>';
         onglet1.appendChild(panelOnglet1);
         ContentItems.appendChild(onglet1);
         

@@ -1,6 +1,6 @@
 // ==UserScript==
 // -*- mode: c; c-basic-offset: 8; -*-
-//  * vim: noexpandtab sw=8 ts=8 sts=0:
+//  * vim: expandtab sw=8 ts=8 sts=0:
 // @name           enhancedBoard
 // @namespace      http://www.linuxfr.org
 // @description    Bring Web 2.0 features to LinuxFr - Version 2010.05.02

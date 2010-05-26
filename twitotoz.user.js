@@ -94,13 +94,10 @@ function manageEvent(event)
                 case 'scroll':
                         break;
                 case 'keypress':
-                        _log("event press " + eventType + " target " + target);
                         break;
                 case 'keyup':
-                        _log("event " + eventType + " target " + target);
                         break;
                 case 'keydown':
-                        _log("event " + eventType + " target " + target);
                         break;
                 case 'change':
                         _log("event " + eventType + " target " + target);
@@ -108,7 +105,6 @@ function manageEvent(event)
                         break;
                 case 'focus':
                         _log("event " + eventType + " target " + target);
-                        onFocus(event);
                         break;
                 case 'mousedown':
                 case 'mouseup':
@@ -117,7 +113,6 @@ function manageEvent(event)
                 case 'mousemove':
                         break;
                 case 'blur':
-                        _log("event " + eventType + " target " + target);
                         if (target == window || target == document) {
                                 GlobalWindowFocus = false;
                         }
@@ -170,33 +165,6 @@ function contains(value)
 }
 
 Array.prototype.contains = contains;
-
-function readCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-                var c = ca[i];
-                while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(
-                                nameEQ.length,c.length);
-        }
-        return null;
-}
-
-function createCookie(name,value,days) {
-        if (days) {
-                var date = new Date();
-                date.setTime(date.getTime()+(days*24*60*60*1000));
-                var expires = "; expires="+date.toGMTString();
-        }
-        else { var expires = "" };
-        document.cookie = name+"="+value+expires+"; path=/";
-}
-
-function quickSetCookie(name,value)
-{
-        createCookie(name,value);
-}
 
 // retourne la position left et top d'un élément
 function findPos(obj) {
@@ -277,6 +245,7 @@ function onLoad()
         addCSS();
         rewriteTotoz();
         initRefresh();
+	_log('end load');
 }
 function onMouseOut() {
 }

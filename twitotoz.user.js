@@ -104,7 +104,6 @@ function manageEvent(event)
                         onChange(event);
                         break;
                 case 'focus':
-                        _log("event " + eventType + " target " + target);
                         break;
                 case 'mousedown':
                 case 'mouseup':

@@ -281,8 +281,10 @@ function onLoad()
         rewriteTotoz();
         initRefresh();
 }
-
-
+function onMouseOut() {
+}
+function onMouseOver() {
+}
 function onClick(event)
 {
         target = event.target;

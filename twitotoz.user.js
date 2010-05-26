@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           twitotoz.user.js 
 // @namespace      http://renardjb.free.fr
-// @description    Bring Totoz feature ton twitter - Version 1
+// @description    Bring Totoz feature ton twitter - Version 2
 // @include        http://twitter.com/*
 // @include        http://www.twitter.com/*
 // @include        https://twitter.com/*
@@ -15,7 +15,7 @@
 // Changelog :  http://pqcc.free.fr/news/index.php?TwiTotoz
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '1';
+const VERSION = '2';
 const DEFAULT_TOTOZ = 'popup' ;
 const DEFAULT_TOTOZSRV = 'http://totoz.eu/';
 const HOME_URL = 'http://pqcc.free.fr/news/';

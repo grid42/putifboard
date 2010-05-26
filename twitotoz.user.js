@@ -43,16 +43,7 @@ var GlobalRefreshTimerId=0;
 //--- End Section  ---
 
 /* ajout des events listeners */
-global_events = ['load','blur','click','submit','mouseover','mouseout',
-                 'mousemove','mousedown','mouseup','keyup','keydown',
-                 'keypress', 'change','focus','dblclick','scroll'];
-for(evt in global_events) {
-        window.addEventListener(global_events[evt],
-                        function(event) { return manageEvent(event); }, true);
-}
-delete global_events;
-
-
+window.addEventListener('load', function(event) { return onLoad(); }, true);
 
 // Section "OnLoadEvent"
 function addCSS()
@@ -64,62 +55,6 @@ function initRefresh()
 {
 	window.clearInterval(currentIntervalId);
         GlobalRefreshTimerId = window.setInterval(refreshSlip,1000);
-}
-
-function manageEvent(event)
-{
-        eventType = event.type;
-        target = event.target;
-        switch(eventType) {
-                case 'load':
-                        _log("event " + eventType + " target " + target);
-                        onLoad();
-                        break;
-                case 'click':
-                        _log("event " + eventType + " target " + target);
-                        onClick(event);
-                        break;
-                case 'submit':
-                        _log("event " + eventType + " target " + target);
-                        onSubmit(target);
-                        event.stopPropagation();
-                        event.preventDefault();
-                        return false;
-                case 'mouseover':
-                        onMouseOver(event);
-                        break;
-                case 'mouseout':
-                        onMouseOut(event);
-                        break;
-                case 'scroll':
-                        break;
-                case 'keypress':
-                        break;
-                case 'keyup':
-                        break;
-                case 'keydown':
-                        break;
-                case 'change':
-                        _log("event " + eventType + " target " + target);
-                        onChange(event);
-                        break;
-                case 'focus':
-                        break;
-                case 'mousedown':
-                case 'mouseup':
-                        _log("event " + eventType + " target " + target);
-                        break;
-                case 'mousemove':
-                        break;
-                case 'blur':
-                        if (target == window || target == document) {
-                                GlobalWindowFocus = false;
-                        }
-                        break;
-                default:
-                        _log("DEF event " + eventType + "target " + target);
-                        break;
-        }
 }
 
 function stringToWiki(message)

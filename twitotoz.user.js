@@ -3,7 +3,7 @@
 //  * vim: noexpandtab sw=8 ts=8 sts=0:
 // @name           twitotoz.user.js 
 // @namespace      http://renardjb.free.fr
-// @description    Bring Totoz feature ton twitter - Version 2
+// @description    Bring Totoz feature ton twitter - Version 3
 // @include        http://twitter.com/*
 // @include        http://www.twitter.com/*
 // @include        https://twitter.com/*
@@ -15,7 +15,7 @@
 // Changelog :  http://pqcc.free.fr/news/index.php?TwiTotoz
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '2';
+const VERSION = '3';
 const DEFAULT_TOTOZ = 'popup' ;
 const DEFAULT_TOTOZSRV = 'http://totoz.eu/';
 const HOME_URL = 'http://pqcc.free.fr/news/';
@@ -27,16 +27,11 @@ var GlobalArrayTotoz = new Array();
 var GlobalPopup = document.createElement('div');
 GlobalPopup.style.display = 'none';
 GlobalPopup.setAttribute('class','popup');
-
-var GlobalTimer = document.createElement('div');
-GlobalTimer.setAttribute('class','timer');
-GlobalTimer.setAttribute('id','timer');
-GlobalTimer.style.display='none';
+GlobalPopup.innerHTML ="<div><img src='" + DEFAULT_TOTOZSRV + "totoz.gif'></diV";
+GlobalPopup.style.display = '';
 
 /* Get a pointer to the main content container in the page */
-const GlobalBoardIndex = evalexp('//div[@id=\'container\']').snapshotItem(0);
-GlobalBoardIndex.appendChild(GlobalPopup);
-GlobalBoardIndex.appendChild(GlobalTimer);
+//const GlobalBoardIndex = evalexp('//div[@id=\'container\']').snapshotItem(0);
 
 var GlobalClickTimer = -1;
 var GlobalRefreshTimerId=0;
@@ -44,11 +39,66 @@ var GlobalRefreshTimerId=0;
 
 /* ajout des events listeners */
 window.addEventListener('load', function(event) { return onLoad(); }, true);
+window.addEventListener('mouseover', function(event) { return onMouseOver(event); }, true);
+//window.addEventListener('mouseout', function(event) { GlobalPopup.style.display = 'none'; }, true);
+
+function onMouseOver(event)
+{
+	target = event.target;
+        name = target.nodeName.toLowerCase();
+        targetClass = target.getAttribute('class');
+        targetId = target.getAttribute('id');
+	if (targetClass=='totoz') {
+		totoz = target.textContent;
+		totoz = totoz.substring(2, totoz.length - 1);
+		GlobalPopup.innerHTML ="<div><img src='" +DEFAULT_TOTOZSRV+ totoz + ".gif' alt='TOTOZ'></diV";
+		_log( GlobalPopup.innerHTML);
+		GlobalPopup.style.display = '';
+		GlobalPopup.style.top = event.clientY +5+ 'px';
+		GlobalPopup.style.left= event.clientX+5 + 'px';
+
+	} else {
+		GlobalPopup.style.display = 'none';
+	}
+}
+
+
+function rewriteMessage(message)
+{
+    message = stringToTotoz(message);
+    return message;
+}
+
+function hello() { alert('hello'); }
+
+function rewriteTotoz()
+{
+        var allTotozMsg = evalexp('//span[@class=\'entry-content\']');
+        for (var i = 0; i < allTotozMsg.snapshotLength; i++)
+        {
+                oneTotozMsg = allTotozMsg.snapshotItem(i);
+                oneTotozMsg.innerHTML = stringToTotoz(oneTotozMsg.innerHTML);
+        }
+        var allTotozMsg = evalexp('//span[@id=\'latest_text\']');
+        for (var i = 0; i < allTotozMsg.snapshotLength; i++)
+        {
+                oneTotozMsg = allTotozMsg.snapshotItem(i);
+                oneTotozMsg.innerHTML = stringToTotoz(oneTotozMsg.innerHTML);
+        }
+	
+}
+
 
 // Section "OnLoadEvent"
 function addCSS()
 {
-        addGlobalStyle( '');
+	var head, style;
+        head = document.getElementsByTagName('head')[0];
+        if (!head) { return; }
+        style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = ".totoz { color: red} div.popup {position:fixed;z-index:99;}";
+        head.appendChild(style);
 }
 
 function initRefresh()
@@ -56,37 +106,6 @@ function initRefresh()
 	window.clearInterval(currentIntervalId);
         GlobalRefreshTimerId = window.setInterval(refreshSlip,1000);
 }
-
-function stringToWiki(message)
-{
-  var index1 = message.indexOf("[[",0);
-  if (index1 != -1 ) {
-     var exp = new RegExp('\\[\\[(.*)\\]\\]', 'gi');
-     return message.replace(exp, '<a href="http://fr.wikipedia.org/wiki/$1">$1</a>');
-  }  else   {
-    return message;
-  }        
-}
-
-function rewriteMessage(message)
-{
-    // On réecrit les leçons, les totoz, les horloges, les urls et les canards
-    message = stringToWiki(message);
-    message = stringToTotoz(message);
-    return message;
-}
-
-function rewriteTotoz()
-{
-        var allTotozMsg = evalexp('//div[@class=\'entry-content\']');
-        for (var i = 0; i < allTotozMsg.snapshotLength; i++)
-        {
-                oneTotozMsg = allTotozMsg.snapshotItem(i);
-                oneTotozMsg.innerHTML = stringToTotoz(oneTotozMsg.innerHTML);
-        }
-}
-
-
 
 /* utils functions */
 function contains(value)
@@ -112,78 +131,6 @@ function findPos(obj) {
                 }
         }
         return [curleft,curtop];
-}
-
-
-/* HTML functions*/
-function getId(element)
-{
-        if(element.hasAttribute('id'))
-                return element.getAttribute('id');
-        return null;
-}
-
-function setId(element, newId)
-{
-        element.setAttribute('id', newId);
-}
-
-function setClass(element, newClass)
-{
-        element.setAttribute('class', newClass);
-}
-
-function getClass(element)
-{
-        return element.getAttribute('class');
-}
-
-function addClass(element,newClass)
-{
-        theClass = element.getAttribute('class');
-        if(!theClass.match(newClass)) {
-                theClass = theClass + ' ' + newClass;
-        }
-        element.setAttribute('class', theClass);
-}
-
-function removeClass(element, oldClass)
-{
-        var exp_sp_before = new RegExp('( ' + oldClass + ')', 'g');
-        var exp_sp_after = new RegExp('(' + oldClass + ' )', 'g');
-        /* une des classes de l'élément, sauf la premiere */
-        if(exp_sp_before.test(getClass(element))) {
-                setClass(element, getClass(element).replace(' '+ oldClass, ''));
-        } else if(exp_sp_after.test(getClass(element))) {
-                setClass(element, getClass(element).replace(''+ oldClass, ' '));
-        } else if(oldClass == getClass(element)) {
-                setClass(element,'') ;
-        }
-}
-
-function addGlobalStyle(css)
-{
-        var head, style;
-        head = document.getElementsByTagName('head')[0];
-        if (!head) { return; }
-        style = document.createElement('style');
-        style.type = 'text/css';
-        style.innerHTML = css;
-        head.appendChild(style);
-}
-
-
-function onLoad()
-{
-	_log('load');
-        addCSS();
-        rewriteTotoz();
-        initRefresh();
-	_log('end load');
-}
-function onMouseOut() {
-}
-function onMouseOver() {
 }
 
 function addTotoz(totoz)
@@ -221,11 +168,8 @@ function showTotoz(totoz, x, y)
 function stringToTotoz(message)
 {
         var exp = /\[\:([^\t\)\]]+)\]/g;
-        if(GM_getValue('dlfp.totoz') == 'popup') {
-            return message.replace(exp, '<span class="totoz" id="$1">[:$1]</span>');
-        } else {
-            return message.replace(exp, '<img src="' + GM_getValue('dlfp.totozsrv') + '$1.gif" />');
-        }
+        return message.replace(exp, '<span class="totoz" id="$1">[:$1]</span>');
+        //return message.replace(exp, '<img src="' + DEFAULT_TOTOZSRV + '$1.gif" />');
 }
 
 function _log(msg) {
@@ -234,4 +178,16 @@ function _log(msg) {
 
 function evalexp(expression) {
         return document.evaluate(expression, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+}
+
+function onLoad()
+{
+	_log('load');
+	GlobalBoardIndex =document.getElementById('timeline_heading');// evalexp('//body').snapshotItem(0);
+	GlobalBoardIndex.appendChild(GlobalPopup);
+
+        addCSS();
+        rewriteTotoz();
+        //initRefresh();
+	_log('end load');
 }

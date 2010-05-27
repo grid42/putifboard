@@ -15,12 +15,10 @@
 // Changelog :  http://pqcc.free.fr/news/index.php?TwiTotoz
 
 //--- Section "DEFINE CONST" ---
-const VERSION = '4';
-const DEFAULT_TOTOZSRV = 'http://sfw.totoz.eu/';
-const HOME_URL = 'http://pqcc.free.fr/news/';
+const TOTOZSRV = 'http://sfw.totoz.eu/';
 //--- End Section  ---
 
-// Le popup des totoz
+//--- Section "popup" ---
 var GlobalPopup = document.createElement('div');
 GlobalPopup.style.display = 'none';
 GlobalPopup.setAttribute('class','popup');
@@ -28,19 +26,24 @@ GlobalPopup.innerHTML ="<div></div>";
 //--- End Section  ---
 
 /* ajout des events listeners */
-window.addEventListener('load', function(event) { return onLoad(); }, true);
-window.addEventListener('mouseover', function(event) { return onMouseOver(event); }, true);
+window.addEventListener('load', function(event) { 
+	document.getElementById('timeline_heading').appendChild(GlobalPopup);
 
-function onMouseOver(event)
-{
+	var style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = ".totoz { color: red} div.popup {position:fixed;z-index:99;}";
+        document.getElementsByTagName('head')[0].appendChild(style);
+
+        writeTotoz();		
+}, true);
+
+window.addEventListener('mouseover', function(event) { 
 	target = event.target;
         name = target.nodeName.toLowerCase();
         targetClass = target.getAttribute('class');
-        targetId = target.getAttribute('id');
 	if (targetClass=='totoz') {
-		totoz = target.textContent;
-		totoz = totoz.substring(2, totoz.length - 1);
-		GlobalPopup.innerHTML ="<div><img src='" +DEFAULT_TOTOZSRV+ totoz + ".gif' alt='TOTOZ'></diV";
+		totoz_url = target.textContent.substring(2, target.textContent.length - 1);
+		GlobalPopup.innerHTML ="<div><img src='" + TOTOZSRV + totoz_url + ".gif' alt='TOTOZ'></diV";
 		GlobalPopup.style.display = '';
 		GlobalPopup.style.top = event.clientY + 15 + 'px';
 		GlobalPopup.style.left= event.clientX + 15 + 'px';
@@ -48,9 +51,9 @@ function onMouseOver(event)
 	} else {
 		GlobalPopup.style.display = 'none';
 	}
-}
+} , true);
 
-function rewriteTotoz()
+function writeTotoz()
 {
         var exp = /\[\:([^\t\)\]]+)\]/g;
         var allTotozMsg = evalexp('//span[@class=\'entry-content\']');
@@ -69,21 +72,5 @@ function rewriteTotoz()
 
 function evalexp(expression) {
         return document.evaluate(expression, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-}
-
-function onLoad()
-{
-	document.getElementById('timeline_heading').appendChild(GlobalPopup);
-
-	// AddCss
-	var head, style;
-        head = document.getElementsByTagName('head')[0];
-        style = document.createElement('style');
-        style.type = 'text/css';
-        style.innerHTML = ".totoz { color: red} div.popup {position:fixed;z-index:99;}";
-        head.appendChild(style);
-
-	// On traite les totoz
-        rewriteTotoz();
 }
 

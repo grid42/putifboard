@@ -19,7 +19,7 @@ const TOTOZSRV = 'http://sfw.totoz.eu/';
 var g_Popup = document.createElement('div');
 g_Popup.style.display = 'none';
 g_Popup.setAttribute('class','popup');
-g_Popup.innerHTML ="<div></div>";
+g_Popup.innerHTML = "<div></div>";
 
 window.addEventListener('load', function(event) { 
 	document.getElementById('timeline_heading').appendChild(g_Popup);
@@ -30,9 +30,9 @@ window.addEventListener('load', function(event) {
         document.getElementsByTagName('head')[0].appendChild(style);
 
         var exp = /\[\:([^\t\)\]]+)\]/g;
-        var allSpan = document.evaluate('//span', document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-        for (var i = 0; i < allSpan.snapshotLength; i++) {
-                item = allSpan.snapshotItem(i);
+        var spans = document.evaluate('//span', document, null, XPathResult.ANY_UNORDERED_NODE_TYPE, null);
+        for (var i = 0; i < spans.snapshotLength; i++) {
+                item = spans.snapshotItem(i);
                 item.innerHTML = item.innerHTML.replace(exp, '<span class="totoz" id="$1">[:$1]</span>')
         }
 }, true);
@@ -48,4 +48,3 @@ window.addEventListener('mouseover', function(event) {
 		g_Popup.style.display = 'none';
 	}
 }, true);
-

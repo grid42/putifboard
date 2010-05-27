@@ -19,7 +19,7 @@ const TOTOZSRV = 'http://sfw.totoz.eu/';
 var g_Popup = document.createElement('div');
 g_Popup.style.display = 'none';
 g_Popup.setAttribute('class','popup');
-g_Popup.innerHTML = "<div></div>";
+g_Popup.innerHTML ="<div></div>";
 
 window.addEventListener('load', function(event) { 
 	document.getElementById('timeline_heading').appendChild(g_Popup);
@@ -30,17 +30,17 @@ window.addEventListener('load', function(event) {
         document.getElementsByTagName('head')[0].appendChild(style);
 
         var exp = /\[\:([^\t\)\]]+)\]/g;
-        var spans = document.evaluate('//span', document, null, XPathResult.ANY_UNORDERED_NODE_TYPE, null);
+        var spans = document.evaluate('//span', document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
         for (var i = 0; i < spans.snapshotLength; i++) {
                 item = spans.snapshotItem(i);
-                item.innerHTML = item.innerHTML.replace(exp, '<span class="totoz" id="$1">[:$1]</span>')
+                item.innerHTML = item.innerHTML.replace(exp, '[:<span class="totoz" id="$1">$1</span>]')
         }
 }, true);
 
 window.addEventListener('mouseover', function(event) { 
 	if (event.target.getAttribute('class') == 'totoz') {
-		url = event.target.textContent.substring(2, event.target.textContent.length - 1);
-		g_Popup.innerHTML = "<div><img src='" + TOTOZSRV + url + ".gif' alt='TOTOZ'></diV";
+		url = TOTOZSRV + event.target.textContent + ".gif" 
+		g_Popup.innerHTML = "<div><img src='" + url + " alt='TOTOZ'></diV";
 		g_Popup.style.top = event.clientY + 15 + 'px';
 		g_Popup.style.left = event.clientX + 15 + 'px';
 		g_Popup.style.display = '';

@@ -33,7 +33,7 @@ window.addEventListener('load', function(event) {
         var spans = document.evaluate('//span', document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
         for (var i = 0; i < spans.snapshotLength; i++) {
                 item = spans.snapshotItem(i);
-                item.innerHTML = item.innerHTML.replace(exp, '[:<span class="totoz" id="$1">$1</span>]')
+                item.innerHTML = item.innerHTML.replace(exp, '[:<span class="totoz">$1</span>]')
         }
 }, true);
 
